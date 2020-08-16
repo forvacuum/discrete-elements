@@ -61,11 +61,13 @@ void generateParticles(string infoFilename, string particlesFilename, double bor
 	fout.close();
 }
 
-vector<Particle> importParticles(string filename, double stiffness) {
+vector<Particle> importParticles(string filename, double stiffness, double border[4]) {
 	ifstream fin(filename);
 	Particle p;
 	vector<Particle> particle;
+	Vector relativePosition;
 	int peekValue;
+	size_t size;
 
 	while ((peekValue = fin.peek()) != EOF) {
 		if (peekValue == ' ' || peekValue == '\n') {
@@ -78,8 +80,15 @@ vector<Particle> importParticles(string filename, double stiffness) {
 		particle.push_back(p);
 		}
 	}
-
 	fin.close();
+
+	size = particle.size();
+
+	for (size_t i = 0; i < size; i++) {
+		particle[i].delta = vector<double>(size);
+	}
+
+	refreshDelta(particle, border);
 
 	return particle;
 }
@@ -97,4 +106,13 @@ void exportDetails(std::string filename, const double border[4], const vector<Pa
 	}
 
 	fout.close();
+}
+
+void appendSystemPosition(std::ofstream& fout, const std::vector<Particle>& system) {
+	auto it = system.begin();
+	while (it != system.end()) {
+		fout << it->position << " ";
+		it++;
+	}
+	fout << endl;
 }

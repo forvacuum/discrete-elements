@@ -1,45 +1,48 @@
 #include "physics.h"
 
-// force function is considered not to be dependent on time explicitly
-void Verlet(Particle& particle, const std::vector<Particle>& system, double timestep, const double border[4]) {
-	/*Vector force = applyForce(particle, system, border);
+// Note: force function is considered not to be dependent on time explicitly
+void calculatePosition(std::vector<Particle>& system, double timestep, const double border[4]) {
+	Vector force;
+	auto it = system.begin();
 
-	//position on the next step
-	particle.position.setX(particle.position.getX() +
-		particle.velocity.getX() * timestep +
-		(force.getX() / 2 / particle.mass) * timestep * timestep);
-	particle.position.setY(particle.position.getY() +
-		particle.velocity.getY() * timestep +
-		(force.getY() / 2 / particle.mass) * timestep * timestep);
+	while (it != system.end()) {
+		force = applyForce(*it, system, border);
 
-	//intermediate velocity
-	particle.velocity.setX(particle.velocity.getX() +
-		timestep * force.getX() / 2 / particle.mass);
-	particle.velocity.setY(particle.velocity.getY() +
-		timestep * force.getY() / 2 / particle.mass);
+		it->position.setX( it->position.getX() + it->velocity.getX() * timestep +
+							(force.getX() / 2 / it->mass) * timestep * timestep );
+		it->position.setY( it->position.getY() + it->velocity.getY() * timestep +
+							(force.getY() / 2 / it->mass) * timestep * timestep );
 
-	//velocity on the next step
-	force = applyForce(particle, system, border); //updating the force vector
-	particle.velocity.setX(particle.velocity.getX() +
-		timestep * force.getX() / 2 / particle.mass);
-	particle.velocity.setY(particle.velocity.getY() +
-		timestep * force.getY() / 2 / particle.mass);*/
+		//intermediate velocity
+		it->velocity.setX(it->velocity.getX() + timestep * force.getX() / 2 / it->mass);
+		it->velocity.setY(it->velocity.getY() + timestep * force.getY() / 2 / it->mass);
 
-	Vector forceOld = applyForce(particle, system, border);
-	Vector forceNew;
-
-	particle.position.setX(particle.position.getX() +
-		particle.velocity.getX() * timestep +
-		(forceOld.getX() / (2 * particle.mass)) * timestep * timestep);
-	particle.position.setY(particle.position.getY() +
-		particle.velocity.getY() * timestep +
-		(forceOld.getY() / (2 * particle.mass)) * timestep * timestep);
-
-	forceNew = applyForce(particle, system, border);
-
-	particle.velocity.setX(particle.velocity.getX() + timestep / (2 * particle.mass) * (forceOld.getX() + forceNew.getX()));
-	particle.velocity.setY(particle.velocity.getY() + timestep / (2 * particle.mass) * (forceOld.getY() + forceNew.getY()));
+		it++;
+	}
+	refreshDelta(system, border);
 }
+
+
+void calculateVelocity(std::vector<Particle>& system, double timestep, const double border[4]) {
+	Vector force;
+	auto it = system.begin();
+
+	while (it != system.end()) {
+
+		//velocity on the next step
+		force = applyForce(*it, system, border); //updating the force vector
+		it->velocity.setX(it->velocity.getX() + timestep * force.getX() / 2 / it->mass);
+		it->velocity.setY(it->velocity.getY() + timestep * force.getY() / 2 / it->mass);
+
+		it++;
+	}
+}
+
+void calculateNextIteration(std::vector<Particle>& system, double timestep, const double border[4]) {
+	calculatePosition(system, timestep, border);
+	calculateVelocity(system, timestep, border);
+}
+
 
 Vector applyForce(const Particle& particle, const std::vector<Particle>& system, const double border[4]) {
 	Vector resultant = Vector();
@@ -113,4 +116,39 @@ double elasticWallEnergy(const Particle& particle, const double border[4]) {
 	}
 
 	return result;
+}
+
+void refreshDelta(std::vector<Particle>& system, const double border[4]) {
+	size_t size;
+	double duplicatedCoordinate[4];
+	Vector relativePosition;
+
+	size = system.size();
+
+	for (size_t i = 0; i < size; i++) {
+		system[i].delta[i] = 0;
+		for (size_t j = 0; j < i; j++) {
+			relativePosition = system[i].position - system[j].position;
+			system[i].delta[j] = system[i].radius + system[j].radius - Vector::norm(relativePosition);
+			if (system[i].delta[j] < 0) {
+				system[i].delta[j] = 0;
+			}
+			system[j].delta[i] = system[i].delta[j];
+		}
+	}
+
+	for (size_t i = 0; i < size; i++) {
+		duplicatedCoordinate[0] = system[i].position.getX();
+		duplicatedCoordinate[1] = system[i].position.getX();
+		duplicatedCoordinate[2] = system[i].position.getY();
+		duplicatedCoordinate[3] = system[i].position.getY();
+
+		for (size_t j = 0; j < 4; j++) {
+			system[i].deltaWall[j] = system[i].radius - pow(-1, j) * (duplicatedCoordinate[j] - border[j]);
+			if (system[i].deltaWall[j] < 0) {
+				system[i].deltaWall[j] = 0;
+			}
+		}
+	}
+
 }

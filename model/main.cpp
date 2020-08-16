@@ -15,6 +15,7 @@ using namespace std;
  *	generateParticles(...): solve the problem of particles overlapping at their initial positions */
 
 int main(int argc, char* argv[]) {
+
 	string infoFilename;
 	string particlesFilename;
 	string generatorInfoFilename;
@@ -27,78 +28,82 @@ int main(int argc, char* argv[]) {
 	double stiffness;
 	bool generatorEnabled;
 
+	ofstream log(stdout);
+
+	log << "Program started" << endl;
+
 	/* Parameters initialization */
 
+
 	if (argc < 3) {
+		log << "Program uses default arguments" << endl;
+
 		infoFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\info.txt";
 		generatorInfoFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\generatorinfo.txt";
 		particlesFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\particles.txt";
 	}
 	else {
+		log << "Program uses command line arguments" << endl;
+
 		infoFilename = argv[1];
 		generatorInfoFilename = argv[2];
 		particlesFilename = argv[2];
 		/* Note: actual choice is user-made and depends on a 'generatorEnabled' flag 
 				 stored in the info file. */
 	}
-	
+
+	log << "Initializing parameters" << endl;
+
 	ifstream fin(infoFilename);
 	for (int i = 0; i < 4; i++) {
 		fin >> border[i];
 	}
+
+	log << "System borders: ";
+	for (int i = 0; i < 4; i++) {
+		log << border[i] << " ";
+	}
+	log << endl;
+
 	fin >> maxTime >> timestep >> stiffness >> generatorEnabled;
+
+	log << "Maximum time: " << maxTime << endl;
+	log << "Time step: " << timestep << endl;
+	log << "Stiffness: " << stiffness << endl;
+	log << "Generator enabled: " << generatorEnabled << endl;
 	fin.close();
 
 	if (generatorEnabled) {
 		particlesFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\particles.txt";
 		generateParticles(generatorInfoFilename, particlesFilename, border);
+		log << "Particles generation is finished" << endl;
 	}
 
 	/* Model computation algorithm */
+	log << "Starting algorithm" << endl;
 
-	auto system = importParticles(particlesFilename, stiffness);
+	auto system = importParticles(particlesFilename, stiffness, border);
+
+	log << "Particles are imported" << endl;
+
 	vector<Particle>::iterator it;
 	double currentTime = 0;
 
 	ofstream fout(outputFilename);
-	ofstream fout_kinetic("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\kinetic.txt");
-	ofstream fout_potential("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\potential.txt");
-	ofstream fout_elastic_p("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\elastic_p.txt");
-	ofstream fout_elastic_w("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\elastic_w.txt");
 
 	while (currentTime < maxTime) {
 		fout << currentTime << " ";
-		it = system.begin();
-
-		while (it != system.end()) {
-			fout << it->position;
-			fout_kinetic << kineticEnergy(*it) << " ";
-			fout_potential << potentialEnergy(*it, border) << " ";
-			fout_elastic_p << elasticParticleEnergy(*it, system) << " ";
-			fout_elastic_w << elasticWallEnergy(*it, border) << " ";
-
-			Verlet(*it, system, timestep, border);
-			it++;
-		}
-
-		fout << endl;
-		fout_kinetic << endl;
-		fout_potential << endl;
-		fout_elastic_p << endl;
-		fout_elastic_w << endl;
-
+		appendSystemPosition(fout, system);
+		calculateNextIteration(system, timestep, border);
 		currentTime += timestep;
 	}
 
 	fout.close();
-	fout_kinetic.close();
-	fout_potential.close();
-	fout_elastic_p.close();
-	fout_elastic_w.close();
 
 	exportDetails("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\info.txt", border, system);
+	log << "Details are exported" << endl;
 
-	cout << "Program model.exe ended succesfully" << endl;
+	log << "Program model.exe ended succesfully" << endl;
 
 	return 0;
 }

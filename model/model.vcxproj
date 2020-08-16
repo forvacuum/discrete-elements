@@ -144,6 +144,7 @@
     <ClCompile Include="force.cpp" />
     <ClCompile Include="impexp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="particle.cpp" />
     <ClCompile Include="physics.cpp" />
     <ClCompile Include="vector2D.cpp" />
   </ItemGroup>

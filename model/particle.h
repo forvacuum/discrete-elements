@@ -10,7 +10,9 @@ struct Particle {
 	double mass;
 	double stiffness;
 
-	bool operator==(const Particle& p) const {
-		return this == &p;
-	}
+	std::vector<double> delta;
+	double deltaWall[4];
+
+	bool operator==(const Particle&) const;
+	bool operator!=(const Particle&) const;
 };
