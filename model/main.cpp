@@ -90,10 +90,11 @@ int main(int argc, char* argv[]) {
 	double currentTime = 0;
 
 	ofstream fout(outputFilename);
-
+	ofstream fout_e("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\info.txt");
 	while (currentTime < maxTime) {
 		fout << currentTime << " ";
 		appendSystemPosition(fout, system);
+		appendSystemEnergy(fout_e, system, border);
 		calculateNextIteration(system, timestep, border);
 		currentTime += timestep;
 	}
