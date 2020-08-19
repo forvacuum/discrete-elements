@@ -34,9 +34,9 @@ int main(int argc, char* argv[]) {
 	if (argc < 3) {
 		log << "Program uses default arguments" << endl;
 
-		infoFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\info.txt";
-		generatorInfoFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\generatorinfo.txt";
-		particlesFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\particles.txt";
+		infoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\info.txt";
+		generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\generatorinfo.txt";
+		particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\particles.txt";
 	}
 	else {
 		log << "Program uses command line arguments" << endl;
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
 	fin.close();
 
 	if (generatorEnabled) {
-		particlesFilename = "C:\\Users\\Veronika\\workspace\\dem\\model\\model\\particles.txt";
+		particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\particles.txt";
 		generateParticles(generatorInfoFilename, particlesFilename, border);
 		log << "Particles generation is finished" << endl;
 	}
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 	double currentTime = 0;
 
 	ofstream fout(outputFilename);
-	ofstream fout_e("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\info.txt");
+	ofstream fout_e(outputEnergyFilename);
   
 	while (currentTime < maxTime) {
 		fout << currentTime << " ";
