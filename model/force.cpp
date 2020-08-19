@@ -35,3 +35,7 @@ Vector applyWallRepulsion(const Particle& p, const double border[4]) {
 
 	return resultant;
 }
+
+Vector applyDissipation(const Particle& p) {
+	return - dampingCoefficient * Vector(p.velocity);
+}

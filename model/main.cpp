@@ -90,6 +90,7 @@ int main(int argc, char* argv[]) {
 	double currentTime = 0;
 
 	ofstream fout(outputFilename);
+	ofstream fout_e(outputEnergyFilename);
 
 	while (currentTime < maxTime) {
 		fout << currentTime << " ";
