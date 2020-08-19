@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <iterator>
 #include <exception>
@@ -9,10 +9,6 @@
 #include "physics.h"
 
 using namespace std;
-
-/* TODO:
- *	calculateTotalEnergy(...) uses the same code as in the applyRepulsion(...) to calculate delta
- *	generateParticles(...): solve the problem of particles overlapping at their initial positions */
 
 int main(int argc, char* argv[]) {
 
@@ -91,6 +87,7 @@ int main(int argc, char* argv[]) {
 
 	ofstream fout(outputFilename);
 	ofstream fout_e("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\info.txt");
+  
 	while (currentTime < maxTime) {
 		fout << currentTime << " ";
 		appendSystemPosition(fout, system);

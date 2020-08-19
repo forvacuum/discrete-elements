@@ -50,6 +50,7 @@ Vector applyForce(const Particle& particle, const std::vector<Particle>& system,
 	resultant += applyWeight(particle);
 	resultant += applyRepulsion(particle, system);
 	resultant += applyWallRepulsion(particle, border);
+	resultant += applyDissipation(particle);
 
 	return resultant;
 }
