@@ -55,7 +55,7 @@ Vector applyForce(const Particle& particle, const std::vector<Particle>& system,
 	return resultant;
 }
 
-double calculateTotalEnergy(const Particle& particle, const std::vector<Particle>& system, const double border[4]) {
+double calculateTotalEnergy(const Particle& particle, const double border[4]) {
 	double totalEnergy = 0;
 
 	/* Kinetic */
@@ -65,10 +65,10 @@ double calculateTotalEnergy(const Particle& particle, const std::vector<Particle
 	totalEnergy += potentialEnergy(particle, border); 
 
 	/* Elastic (particles) */
-	totalEnergy += elasticParticleEnergy(particle, system);
+	totalEnergy += elasticParticleEnergy(particle);
 	
 	/* Elastic (walls) */
-	totalEnergy += elasticWallEnergy(particle, border);
+	totalEnergy += elasticWallEnergy(particle);
 
 	return totalEnergy;
 }
@@ -81,39 +81,22 @@ double potentialEnergy(const Particle& particle, const double border[4]) {
 	return particle.mass * g * (particle.position.getY() - border[2]);  //reference level is consdered to be exactly the bottom border line
 }
 
-double elasticParticleEnergy(const Particle& particle, const std::vector<Particle>& system) {
+double elasticParticleEnergy(const Particle& particle) {
 	double result = 0;
-	double delta;
-	auto it = system.begin();
+	size_t size = particle.delta.size();
 
-	while (it != system.end()) {
-		delta = particle.radius + it->radius - Vector::norm(particle.position - it->position);
-		if (delta <= 0 || particle == *it) {
-			it++;
-			continue;
-		}
-
-		result += particle.stiffness * delta * delta / 4;
-		it++;
+	for (size_t i = 0; i < size; i++) {
+		result += particle.stiffness * particle.delta[i] * particle.delta[i] / 4;
 	}
 
 	return result;
 }
 
-double elasticWallEnergy(const Particle& particle, const double border[4]) {
+double elasticWallEnergy(const Particle& particle) {
 	double result = 0;
-	double delta;
-	double duplicatedCoordinate[4] = { particle.position.getX(), particle.position.getX(),
-									particle.position.getY(), particle.position.getY() };
 
 	for (int i = 0; i < 4; i++) {
-		delta = particle.radius - pow(-1, i) * (duplicatedCoordinate[i] - border[i]);
-
-		if (delta <= 0) {
-			continue;
-		}
-
-		result += particle.stiffness * delta * delta / 2;
+		result += particle.stiffness * particle.deltaWall[i] * particle.deltaWall[i] / 2;
 	}
 
 	return result;

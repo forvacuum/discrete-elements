@@ -116,3 +116,12 @@ void appendSystemPosition(std::ofstream& fout, const std::vector<Particle>& syst
 	}
 	fout << endl;
 }
+
+void appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, const double border[4]) {
+	auto it = system.begin();
+	while (it != system.end()) {
+		fout << calculateTotalEnergy(*it, border) << " ";
+		it++;
+	}
+	fout << endl;
+}
