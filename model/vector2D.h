@@ -23,6 +23,7 @@ public:
 	friend Vector operator* (double, const Vector&);
 	Vector operator=(const Vector&);
 	bool operator==(const Vector&) const;
+	bool operator!=(const Vector&) const;
 
 	static double dotProduct(const Vector&, const Vector&);
 	static double norm(const Vector&);

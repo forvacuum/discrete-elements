@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="force.cpp" />
+    <ClCompile Include="grid.cpp" />
     <ClCompile Include="impexp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="particle.cpp" />
@@ -150,15 +151,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="force.h" />
+    <ClInclude Include="grid.h" />
     <ClInclude Include="impexp.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="vector2D.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="generatorinfo.txt" />
-    <Text Include="info.txt" />
-    <Text Include="particles.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
