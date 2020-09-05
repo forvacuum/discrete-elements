@@ -7,6 +7,7 @@
 #include "impexp.h"
 #include "force.h"
 #include "physics.h"
+#include "grid.h"
 
 using namespace std;
 
@@ -36,7 +37,7 @@ int main(int argc, char* argv[]) {
 
 		infoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\info.txt";
 		generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\generatorinfo.txt";
-		particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\particles.txt";
+		particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\particles.txt";
 	}
 	else {
 		log << "Program uses command line arguments" << endl;
@@ -79,8 +80,14 @@ int main(int argc, char* argv[]) {
 	log << "Starting algorithm" << endl;
 
 	auto system = importParticles(particlesFilename, stiffness, border);
+	GridCell::defaultSize = Particle::maxRadius * 2;
 
 	log << "Particles are imported" << endl;
+
+	auto grid = GridCell::setGrid(border);
+	Particle::setGridCellPositions(system, grid);
+	GridCell::setCellsContents(grid, system);
+	refreshDeltaWall(grid, border);
 
 	vector<Particle>::iterator it;
 	double currentTime = 0;
@@ -91,8 +98,8 @@ int main(int argc, char* argv[]) {
 	while (currentTime < maxTime) {
 		fout << currentTime << " ";
 		appendSystemPosition(fout, system);
-		appendSystemEnergy(fout_e, system, border);
-		calculateNextIteration(system, timestep, border);
+		appendSystemEnergy(fout_e, system, grid, border);
+		calculateNextIteration(system, grid, timestep, border);
 		currentTime += timestep;
 	}
 
@@ -105,4 +112,3 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
-

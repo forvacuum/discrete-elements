@@ -69,8 +69,12 @@ Vector Vector::operator=(const Vector& vector) {
 	return *this;
 }
 
-bool Vector::operator==(const Vector& vector) const{
+bool Vector::operator==(const Vector& vector) const {
 	return x == vector.x && y == vector.y;
+}
+
+bool Vector::operator!=(const Vector& vector) const {
+	return !(*this == vector);
 }
 
 double Vector::dotProduct(const Vector& left, const Vector& right) {

@@ -33,6 +33,9 @@
     <ClCompile Include="particle.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="grid.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="particle.h">
@@ -50,16 +53,8 @@
     <ClInclude Include="physics.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="info.txt">
-      <Filter>Исходные файлы</Filter>
-    </Text>
-    <Text Include="particles.txt">
-      <Filter>Исходные файлы</Filter>
-    </Text>
-    <Text Include="generatorinfo.txt">
-      <Filter>Исходные файлы</Filter>
-    </Text>
+    <ClInclude Include="grid.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

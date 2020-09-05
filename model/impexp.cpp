@@ -68,6 +68,7 @@ vector<Particle> importParticles(string filename, double stiffness, double borde
 	Vector relativePosition;
 	int peekValue;
 	size_t size;
+	double maxRadius = 0;
 
 	while ((peekValue = fin.peek()) != EOF) {
 		if (peekValue == ' ' || peekValue == '\n') {
@@ -76,7 +77,11 @@ vector<Particle> importParticles(string filename, double stiffness, double borde
 		else {		
 		fin >> p.radius >> p.mass;
 		fin >> p.position >> p.velocity;
-		p.stiffness = stiffness;
+
+		if (p.radius > maxRadius) {
+			maxRadius = p.radius;
+		}
+
 		particle.push_back(p);
 		}
 	}
@@ -84,11 +89,8 @@ vector<Particle> importParticles(string filename, double stiffness, double borde
 
 	size = particle.size();
 
-	for (size_t i = 0; i < size; i++) {
-		particle[i].delta = vector<double>(size);
-	}
-
-	refreshDelta(particle, border);
+	Particle::stiffness = stiffness;
+	Particle::maxRadius = maxRadius;
 
 	return particle;
 }
@@ -117,10 +119,10 @@ void appendSystemPosition(std::ofstream& fout, const std::vector<Particle>& syst
 	fout << endl;
 }
 
-void appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, const double border[4]) {
+void appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, std::vector<GridCell>& grid, const double border[4]) {
 	auto it = system.begin();
 	while (it != system.end()) {
-		fout << calculateTotalEnergy(*it, border) << " ";
+		fout << calculateTotalEnergy(*it, border, grid) << " ";
 		it++;
 	}
 	fout << endl;
