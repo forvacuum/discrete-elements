@@ -2,7 +2,7 @@
 
 using namespace std;
 
-/* This function creates a file named as specified in the argument 'filename' 
+/* This function creates a file named as specified in the argument 'particlesFilename' 
 	containing initial data for given amount of randomly generated particles 
 	
 	File structure:
@@ -10,7 +10,7 @@ using namespace std;
 	...		...		...		...		...		...
 	a(N)	m(N)	x_0(N)	y_0(N)	v_x(N)	v_y(N)		 */
 
-void generateParticles(string infoFilename, string particlesFilename, double border[4]) {
+void generateParticlesRandom(string infoFilename, string particlesFilename, double border[4]) {
 	srand(time(0));
 
 	size_t amount;
@@ -58,6 +58,60 @@ void generateParticles(string infoFilename, string particlesFilename, double bor
 
 		fout << endl;
 	}
+	fout.close();
+}
+
+
+void generateParticlesTriangle(std::string infoFilename, std::string particlesFilename, double border[4]) {
+	srand(time(0));
+
+	size_t amount;
+	size_t N = 0;
+	size_t rowCounter = 0;
+
+	double minRadius;
+	double maxRadius;
+	double currentRadius;
+	double tmp;
+
+	double mass;
+
+	double currentX;
+	double currentY;
+	double horizontalStep;
+	double verticalStep;
+
+	ifstream fin(infoFilename);
+	fin >> amount >> minRadius >> maxRadius >> mass;
+	fin.close();
+
+	currentY = border[2] + maxRadius;
+	horizontalStep = 2 * maxRadius;
+	verticalStep = sqrt(3) * maxRadius;
+
+	ofstream fout(particlesFilename);
+	while (N < amount) {
+
+		if (rowCounter % 2 == 0) {
+			currentX = border[0] + maxRadius;
+		}
+		else {
+			currentX = border[0] + 2 * maxRadius;
+		}
+
+		while (currentX < border[1] - maxRadius) {
+			tmp = (double)rand() / RAND_MAX; //random real number in the interval [0, 1)
+			currentRadius = minRadius + tmp * (maxRadius - minRadius);
+			fout << currentRadius << " " << mass << " " << currentX << " " << currentY << " 0 0" << endl;
+			N++;
+			if (N >= 100) break;
+			currentX += horizontalStep;
+		}
+
+		rowCounter++;
+		currentY += verticalStep;
+	}
+
 	fout.close();
 }
 
