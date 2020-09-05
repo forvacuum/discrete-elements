@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
 
 	if (generatorEnabled) {
 		particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\particles.txt";
-		generateParticles(generatorInfoFilename, particlesFilename, border);
+		generateParticlesTriangle(generatorInfoFilename, particlesFilename, border);
 		log << "Particles generation is finished" << endl;
 	}
 
