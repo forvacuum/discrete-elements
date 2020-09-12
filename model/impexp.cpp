@@ -61,7 +61,6 @@ void generateParticlesRandom(string infoFilename, string particlesFilename, doub
 	fout.close();
 }
 
-
 void generateParticlesTriangle(std::string infoFilename, std::string particlesFilename, double border[4]) {
 	srand(time(0));
 
