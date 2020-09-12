@@ -13,9 +13,9 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-	string infoFilename;
-	string particlesFilename;
-	string generatorInfoFilename;
+	string infoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\info.txt";
+	string particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\particles.txt";
+	string generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\generatorinfo.txt";
 	string outputFilename = "C:\\Users\\Veronika\\workspace\\dem\\visualisation\\output.txt";
 	string outputEnergyFilename = "C:\\Users\\Veronika\\workspace\\dem\\visualisation\\energy.txt";
 
@@ -30,24 +30,6 @@ int main(int argc, char* argv[]) {
 	log << "Program started" << endl;
 
 	/* Parameters initialization */
-
-
-	if (argc < 3) {
-		log << "Program uses default arguments" << endl;
-
-		infoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\info.txt";
-		generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\generatorinfo.txt";
-		particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\particles.txt";
-	}
-	else {
-		log << "Program uses command line arguments" << endl;
-
-		infoFilename = argv[1];
-		generatorInfoFilename = argv[2];
-		particlesFilename = argv[2];
-		/* Note: actual choice is user-made and depends on a 'generatorEnabled' flag 
-				 stored in the info file. */
-	}
 
 	log << "Initializing parameters" << endl;
 
