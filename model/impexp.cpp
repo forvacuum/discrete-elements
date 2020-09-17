@@ -172,11 +172,18 @@ void appendSystemPosition(std::ofstream& fout, const std::vector<Particle>& syst
 	fout << endl;
 }
 
-void appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, std::vector<GridCell>& grid, const double border[4]) {
+double appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, std::vector<GridCell>& grid, const double border[4]) {
 	auto it = system.begin();
+	double systemEnergy = 0;
+	double tmp;
+
 	while (it != system.end()) {
-		fout << calculateTotalEnergy(*it, border, grid) << " ";
+		tmp = calculateTotalEnergy(*it, border, grid);
+		systemEnergy += tmp;
+		fout << tmp << " ";
 		it++;
 	}
 	fout << endl;
+
+	return systemEnergy;
 }
