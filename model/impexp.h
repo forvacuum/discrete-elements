@@ -14,4 +14,4 @@ void generateParticlesTriangle(std::string, std::string, double[4]);
 std::vector<Particle> importParticles(std::string, double, double[4]);
 void exportDetails(std::string, const double[4], const std::vector<Particle>);
 void appendSystemPosition(std::ofstream&, const std::vector<Particle>&);
-void appendSystemEnergy(std::ofstream&, const std::vector<Particle>&, std::vector<GridCell>&, const double[4]);
+double appendSystemEnergy(std::ofstream&, const std::vector<Particle>&, std::vector<GridCell>&, const double[4]);

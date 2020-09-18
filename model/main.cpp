@@ -20,7 +20,6 @@ int main(int argc, char* argv[]) {
 	string outputEnergyFilename = "C:\\Users\\Veronika\\workspace\\dem\\visualisation\\energy.txt";
 
 	double border[4];
-	double maxTime;
 	double timestep;
 	double stiffness;
 	bool generatorEnabled;
@@ -44,9 +43,8 @@ int main(int argc, char* argv[]) {
 	}
 	log << endl;
 
-	fin >> maxTime >> timestep >> stiffness >> generatorEnabled;
+	fin >> timestep >> stiffness >> generatorEnabled;
 
-	log << "Maximum time: " << maxTime << endl;
 	log << "Time step: " << timestep << endl;
 	log << "Stiffness: " << stiffness << endl;
 	log << "Generator enabled: " << generatorEnabled << endl;
@@ -73,17 +71,23 @@ int main(int argc, char* argv[]) {
 
 	vector<Particle>::iterator it;
 	double currentTime = 0;
+	double systemEnergy = 0;
+	double energyDiff = 0;
+	double eps = 1e-6;
 
 	ofstream fout(outputFilename);
 	ofstream fout_e(outputEnergyFilename);
   
-	while (currentTime < maxTime) {
+	 do {
 		fout << currentTime << " ";
 		appendSystemPosition(fout, system);
-		appendSystemEnergy(fout_e, system, grid, border);
+		energyDiff = systemEnergy;
+		systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+		energyDiff -= systemEnergy;
 		calculateNextIteration(system, grid, timestep, border);
 		currentTime += timestep;
-	}
+
+	 } while (abs(energyDiff) >= eps || currentTime < 1);
 
 	fout.close();
 
