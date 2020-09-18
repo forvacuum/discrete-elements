@@ -163,10 +163,11 @@ void refreshDeltaWall(std::vector<GridCell>& grid, const double border[4]) {
 
 	/* Right wall */
 	for (int i = 0; i < GridCell::verticalAmount; i++) {
-		it = grid.at(i + GridCell::horizontalAmount * (GridCell::verticalAmount - 1)).contents.begin(); //going through particles in all right cells
+		size_t tmp = i + (GridCell::horizontalAmount - 1) * GridCell::verticalAmount;
+		it = grid.at(i + (GridCell::horizontalAmount - 1) * GridCell::verticalAmount).contents.begin(); //going through particles in all right cells
 
 		//ending marker
-		it_end = grid.at(i + GridCell::horizontalAmount * (GridCell::verticalAmount - 1)).contents.end();
+		it_end = grid.at(i + (GridCell::horizontalAmount - 1) * GridCell::verticalAmount).contents.end();
 
 		while (it != it_end) {
 			(*it)->deltaWall[1] = (*it)->radius + ((*it)->position.getX() - border[1]);
