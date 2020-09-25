@@ -41,16 +41,6 @@ Vector applyRepulsion(const Particle& p, std::vector<GridCell>& grid) {
 		}
 	}
 
-	//while (it != system.end()) {
-	//	relativePosition = p.position - it->position;
-	//	if (*it != p) {
-	//		n = relativePosition * (1 / Vector::norm(relativePosition));
-	//		resultant += Particle::stiffness * p.delta[counter] * n;
-	//	}
-	//	counter++;
-	//	it++;
-	//}
-
 	return resultant;
 }
 
@@ -60,7 +50,9 @@ Vector applyWallRepulsion(const Particle& p, const double border[4]) {
 								Vector(0, 1), Vector(0, 1) };
 
 	for (int i = 0; i < 4; i++) {
-		resultant += pow(-1, i) * duplicatedBasis[i] * Particle::stiffness * p.deltaWall[i];
+		if (Particle::isWallEnabled[i]) {
+			resultant += pow(-1, i) * duplicatedBasis[i] * Particle::stiffness * p.deltaWall[i];
+		}
 	}
 
 	return resultant;

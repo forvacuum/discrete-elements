@@ -67,27 +67,46 @@ int main(int argc, char* argv[]) {
 	auto grid = GridCell::setGrid(border);
 	Particle::setGridCellPositions(system, grid);
 	GridCell::setCellsContents(grid, system);
-	refreshDeltaWall(grid, border);
+	Particle::refreshDeltaWall(grid, border);
 
 	vector<Particle>::iterator it;
-	double currentTime = 0;
+	double preparationTime = 0;
+	double workTime = 0;
+	double totalTime = 0;
 	double systemEnergy = 0;
 	double energyDiff = 0;
-	double eps = 1e-6;
+	double eps = 1e-5;
 
 	ofstream fout(outputFilename);
 	ofstream fout_e(outputEnergyFilename);
-  
-	 do {
-		fout << currentTime << " ";
+
+	do {
+		fout << preparationTime << " ";
 		appendSystemPosition(fout, system);
 		energyDiff = systemEnergy;
 		systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
 		energyDiff -= systemEnergy;
 		calculateNextIteration(system, grid, timestep, border);
-		currentTime += timestep;
+		preparationTime += timestep;
 
-	 } while (abs(energyDiff) >= eps || currentTime < 1);
+	} while (abs(energyDiff) >= eps || preparationTime < 1);
+
+	log << "Packing is ready" << endl;
+	//Particle::isWallEnabled[1] = false;
+	border[1] *= 2;
+	totalTime += preparationTime;
+
+	do {
+		fout << totalTime << " ";
+		appendSystemPosition(fout, system);
+		energyDiff = systemEnergy;
+		systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+		energyDiff -= systemEnergy;
+		calculateNextIteration(system, grid, timestep, border);
+		workTime += timestep;
+		totalTime += timestep;
+
+	} while (abs(energyDiff) >= eps || workTime < 1);
 
 	fout.close();
 
