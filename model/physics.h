@@ -17,5 +17,3 @@ double kineticEnergy(const Particle&);
 double potentialEnergy(const Particle&, const double[4]);
 double elasticParticleEnergy(const Particle&, std::vector<GridCell>&);
 double elasticWallEnergy(const Particle&);
-
-void refreshDeltaWall(std::vector<GridCell>&, const double[4]);

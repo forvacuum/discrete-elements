@@ -24,7 +24,7 @@ void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& gri
 		it++;
 	}
 
-	refreshDeltaWall(grid, border);
+	Particle::refreshDeltaWall(grid, border);
 
 }
 
@@ -138,109 +138,4 @@ double elasticWallEnergy(const Particle& particle) {
 	}
 
 	return result;
-}
-
-void refreshDeltaWall(std::vector<GridCell>& grid, const double border[4]) {
-	std::vector<Particle*>::iterator it;
-	std::vector<Particle*>::iterator it_end;
-
-	/* Left wall */
-	for (int i = 0; i < GridCell::verticalAmount; i++) {
-		it = grid.at(i).contents.begin(); //going through particles in all left cells
-
-		//ending marker
-		it_end = grid.at(i).contents.end();
-
-		while (it != it_end) {
-			(*it)->deltaWall[0] = (*it)->radius - ((*it)->position.getX() - border[0]);
-			if ((*it)->deltaWall[0] < 0) {
-				(*it)->deltaWall[0] = 0;
-			}
-
-			it++;
-		}
-	}
-
-	/* Right wall */
-	for (int i = 0; i < GridCell::verticalAmount; i++) {
-		size_t tmp = i + (GridCell::horizontalAmount - 1) * GridCell::verticalAmount;
-		it = grid.at(i + (GridCell::horizontalAmount - 1) * GridCell::verticalAmount).contents.begin(); //going through particles in all right cells
-
-		//ending marker
-		it_end = grid.at(i + (GridCell::horizontalAmount - 1) * GridCell::verticalAmount).contents.end();
-
-		while (it != it_end) {
-			(*it)->deltaWall[1] = (*it)->radius + ((*it)->position.getX() - border[1]);
-			if ((*it)->deltaWall[1] < 0) {
-				(*it)->deltaWall[1] = 0;
-			}
-
-			it++;
-		}
-	}
-
-	/* Bottom wall */
-	for (int i = 0; i < GridCell::horizontalAmount; i++) {
-		it = grid.at(i * GridCell::verticalAmount).contents.begin(); //going through particles in all bottom cells
-
-		//ending marker
-		it_end = grid.at(i * GridCell::verticalAmount).contents.end();
-
-		while (it != it_end) {
-			(*it)->deltaWall[2] = (*it)->radius - ((*it)->position.getY() - border[2]);
-			if ((*it)->deltaWall[2] < 0) {
-				(*it)->deltaWall[2] = 0;
-			}
-
-			it++;
-		}
-	}
-
-	/* Top wall */
-	for (int i = 0; i < GridCell::horizontalAmount; i++) {
-		it = grid.at(i * GridCell::verticalAmount + GridCell::verticalAmount - 1).contents.begin(); //going through particles in all top cells
-
-		//ending marker
-		it_end = grid.at(i * GridCell::verticalAmount + GridCell::verticalAmount - 1).contents.end();
-
-		while (it != it_end) {
-			(*it)->deltaWall[3] = (*it)->radius + ((*it)->position.getY() - border[3]);
-			if ((*it)->deltaWall[3] < 0) {
-				(*it)->deltaWall[3] = 0;
-			}
-
-			it++;
-		}
-	}
-
-
-	//size_t size;
-	//double duplicatedCoordinate[4];
-	//Vector relativePosition;
-
-	//for (size_t i = 0; i < size; i++) {
-	//	system[i].delta[i] = 0;
-	//	for (size_t j = 0; j < i; j++) {
-	//		relativePosition = system[i].position - system[j].position;
-	//		system[i].delta[j] = system[i].radius + system[j].radius - Vector::norm(relativePosition);
-	//		if (system[i].delta[j] < 0) {
-	//			system[i].delta[j] = 0;
-	//		}
-	//		system[j].delta[i] = system[i].delta[j];
-	//	}
-	//}
-
-	//for (size_t i = 0; i < size; i++) {
-	//	duplicatedCoordinate[0] = system[i].position.getX();
-	//	duplicatedCoordinate[1] = system[i].position.getX();
-	//	duplicatedCoordinate[2] = system[i].position.getY();
-	//	duplicatedCoordinate[3] = system[i].position.getY();
-
-	//	for (size_t j = 0; j < 4; j++) {
-	//		system[i].deltaWall[j] = system[i].radius - pow(-1, j) * (duplicatedCoordinate[j] - border[j]);
-	//		if (system[i].deltaWall[j] < 0) {
-	//			system[i].deltaWall[j] = 0;
-	//		}
-	//	}
-	//}
 }

@@ -20,10 +20,12 @@ struct Particle {
 
 	static double stiffness;
 	static double maxRadius;
+	static bool isWallEnabled[4];
 
 	Particle();
 	bool operator==(const Particle&) const;
 	bool operator!=(const Particle&) const;
 	void refreshGridCoordinates(std::vector<GridCell>&);
 	static void setGridCellPositions(std::vector<Particle>&, const std::vector<GridCell>&);
+	static void refreshDeltaWall(std::vector<GridCell>&, const double[4]);
 };
