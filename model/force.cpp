@@ -4,7 +4,7 @@ Vector applyWeight(const Particle& p) {
 	return (- p.mass * g * Vector(0, 1));
 }
 
-Vector applyRepulsion(const Particle& p, std::vector<GridCell>& grid) {
+Vector applyAttractionRepulsion(const Particle& p, std::vector<GridCell>& grid) {
 	Vector resultant = Vector();
 	Vector relativePosition;
 	Vector n;
@@ -28,12 +28,18 @@ Vector applyRepulsion(const Particle& p, std::vector<GridCell>& grid) {
 						n = relativePosition * (1 / Vector::norm(relativePosition));
 						delta = p.radius + (*it)->radius - Vector::norm(relativePosition);
 
-						if (delta < 0 || *it == &p) {
+						if (*it == &p) {
 							it++;
 							continue;
 						}
+						if (delta >= 0) {
+							resultant += Particle::stiffnessRepulsive * delta * n;
+						}
+						else if (Particle::isPacked && (-delta) < Particle::criticalDistance) {
+							//delta here is a negative value so the force direction will be reversedB
+							resultant += Particle::stiffnessAttractive * delta * n;
+						}
 
-						resultant += Particle::stiffness * delta * n;
 						it++;
 					}
 				}
@@ -51,7 +57,7 @@ Vector applyWallRepulsion(const Particle& p, const double border[4]) {
 
 	for (int i = 0; i < 4; i++) {
 		if (Particle::isWallEnabled[i]) {
-			resultant += pow(-1, i) * duplicatedBasis[i] * Particle::stiffness * p.deltaWall[i];
+			resultant += pow(-1, i) * duplicatedBasis[i] * Particle::stiffnessRepulsive * p.deltaWall[i];
 		}
 	}
 
