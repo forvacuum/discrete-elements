@@ -55,7 +55,7 @@ Vector applyForce(const Particle& particle, std::vector<GridCell>& grid, const d
 	Vector resultant = Vector();
 
 	resultant += applyWeight(particle);
-	resultant += applyRepulsion(particle, grid);
+	resultant += applyAttractionRepulsion(particle, grid);
 	resultant += applyWallRepulsion(particle, border);
 	resultant += applyDissipation(particle);
 
@@ -107,12 +107,17 @@ double elasticParticleEnergy(const Particle& particle, std::vector<GridCell>& gr
 					while (it != lastParticle) {
 						delta = particle.radius + (*it)->radius - Vector::norm(particle.position - (*it)->position);
 
-						if (delta < 0 || *it == &particle) {
+						if (*it == &particle) {
 							it++;
 							continue;
 						}
 
-						result += Particle::stiffness * delta * delta / 4;
+						if (delta > 0) {
+							result += Particle::stiffnessRepulsive * delta * delta / 4;
+						}
+						else if (Particle::isPacked && (-delta) > Particle::criticalDistance) {
+							result += Particle::stiffnessAttractive * delta * delta / 4;
+						}
 
 						it++;
 					}
@@ -121,12 +126,6 @@ double elasticParticleEnergy(const Particle& particle, std::vector<GridCell>& gr
 		}
 	}
 
-	//size_t size = particle.delta.size();
-
-	//for (size_t i = 0; i < size; i++) {
-	//	result += Particle::stiffness * particle.delta[i] * particle.delta[i] / 4;
-	//}
-
 	return result;
 }
 
@@ -134,8 +133,9 @@ double elasticWallEnergy(const Particle& particle) {
 	double result = 0;
 
 	for (int i = 0; i < 4; i++) {
-		result += Particle::stiffness * particle.deltaWall[i] * particle.deltaWall[i] / 2;
+		result += Particle::stiffnessRepulsive * particle.deltaWall[i] * particle.deltaWall[i] / 2;
 	}
 
 	return result;
 }
+
