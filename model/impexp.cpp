@@ -114,7 +114,7 @@ void generateParticlesTriangle(std::string infoFilename, std::string particlesFi
 	fout.close();
 }
 
-vector<Particle> importParticles(string filename, double stiffness, double border[4]) {
+vector<Particle> importParticles(string filename, double stiffnessRepulsive, double stiffnesCohesive, double border[4]) {
 	ifstream fin(filename);
 	Particle p;
 	vector<Particle> particle;
@@ -142,7 +142,8 @@ vector<Particle> importParticles(string filename, double stiffness, double borde
 
 	size = particle.size();
 
-	Particle::stiffness = stiffness;
+	Particle::stiffnessRepulsive = stiffnessRepulsive;
+	Particle::stiffnessAttractive = stiffnesCohesive;
 	Particle::maxRadius = maxRadius;
 
 	return particle;

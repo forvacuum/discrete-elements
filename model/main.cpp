@@ -21,7 +21,8 @@ int main(int argc, char* argv[]) {
 
 	double border[4];
 	double timestep;
-	double stiffness;
+	double stiffnessRepulsive;
+	double stiffnessAttractive;
 	bool generatorEnabled;
 
 	ofstream log(stdout);
@@ -43,10 +44,11 @@ int main(int argc, char* argv[]) {
 	}
 	log << endl;
 
-	fin >> timestep >> stiffness >> generatorEnabled;
+	fin >> timestep >> stiffnessRepulsive >> stiffnessAttractive >> generatorEnabled;
 
 	log << "Time step: " << timestep << endl;
-	log << "Stiffness: " << stiffness << endl;
+	log << "Stiffness on repulsion: " << stiffnessRepulsive << endl;
+	log << "Stiffness on cohesion: " << stiffnessAttractive << endl;
 	log << "Generator enabled: " << generatorEnabled << endl;
 	fin.close();
 
@@ -59,7 +61,7 @@ int main(int argc, char* argv[]) {
 	/* Model computation algorithm */
 	log << "Starting algorithm" << endl;
 
-	auto system = importParticles(particlesFilename, stiffness, border);
+	auto system = importParticles(particlesFilename, stiffnessRepulsive, stiffnessAttractive, border);
 	GridCell::defaultSize = Particle::maxRadius * 2;
 
 	log << "Particles are imported" << endl;
@@ -75,7 +77,7 @@ int main(int argc, char* argv[]) {
 	double totalTime = 0;
 	double systemEnergy = 0;
 	double energyDiff = 0;
-	double eps = 1e-5;
+	double eps = 1e-6;
 
 	ofstream fout(outputFilename);
 	ofstream fout_e(outputEnergyFilename);
@@ -92,6 +94,7 @@ int main(int argc, char* argv[]) {
 	} while (abs(energyDiff) >= eps || preparationTime < 1);
 
 	log << "Packing is ready" << endl;
+	Particle::isPacked = true;
 	//Particle::isWallEnabled[1] = false;
 	border[1] *= 2;
 	totalTime += preparationTime;

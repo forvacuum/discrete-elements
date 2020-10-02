@@ -18,9 +18,12 @@ struct Particle {
 	//std::vector<double> delta;
 	double deltaWall[4];
 
-	static double stiffness;
+	static double stiffnessRepulsive;
+	static double stiffnessAttractive;
 	static double maxRadius;
+	static double criticalDistance;
 	static bool isWallEnabled[4];
+	static bool isPacked;
 
 	Particle();
 	bool operator==(const Particle&) const;

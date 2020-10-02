@@ -1,8 +1,11 @@
 #include "particle.h"
 
 double Particle::maxRadius = 0;
-double Particle::stiffness = 0;
+double Particle::stiffnessRepulsive = 0;
+double Particle::stiffnessAttractive = 0;
+double Particle::criticalDistance = 0.1;
 bool Particle::isWallEnabled[4] = {true, true, true, true};
+bool Particle::isPacked = false;
 
 Particle::Particle() {
 	position = Vector();
