@@ -92,11 +92,7 @@ int main(int argc, char* argv[]) {
 	} while (abs(energyDiff) >= eps || preparationTime < 1);
 
 	log << "Packing is ready" << endl;
-
-	//Uncomment the following line to disable the right wall
 	//Particle::isWallEnabled[1] = false;
-
-	//Uncomment the following line to move the right wall two times further from its position
 	border[1] *= 2;
 	totalTime += preparationTime;
 
