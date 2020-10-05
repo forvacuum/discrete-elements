@@ -77,7 +77,10 @@ int main(int argc, char* argv[]) {
 	double totalTime = 0;
 	double systemEnergy = 0;
 	double energyDiff = 0;
-	double eps = 1e-6;
+	double eps = 1e-5;
+
+	exportDetails("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\info.txt", border, system);
+	log << "Details are exported" << endl;
 
 	ofstream fout(outputFilename);
 	ofstream fout_e(outputEnergyFilename);
@@ -112,9 +115,6 @@ int main(int argc, char* argv[]) {
 	} while (abs(energyDiff) >= eps || workTime < 1);
 
 	fout.close();
-
-	exportDetails("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\info.txt", border, system);
-	log << "Details are exported" << endl;
 
 	log << "Program model.exe ended succesfully" << endl;
 
