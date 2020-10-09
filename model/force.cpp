@@ -4,7 +4,7 @@ Vector applyWeight(const Particle& p) {
 	return (- p.mass * g * Vector(0, 1));
 }
 
-Vector applyAttractionRepulsion(const Particle& p, std::vector<GridCell>& grid) {
+Vector applyNormalForce(const Particle& p, std::vector<GridCell>& grid) {
 	Vector resultant = Vector();
 	Vector relativePosition;
 	Vector n;

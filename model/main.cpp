@@ -13,11 +13,11 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 
-	string infoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\info.txt";
-	string particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\particles.txt";
-	string generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\model\\generatorinfo.txt";
-	string outputFilename = "C:\\Users\\Veronika\\workspace\\dem\\visualisation\\output.txt";
-	string outputEnergyFilename = "C:\\Users\\Veronika\\workspace\\dem\\visualisation\\energy.txt";
+	string infoFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\info.txt";
+	string particlesFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\particles.txt";
+	string generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\generatorinfo.txt";
+	string outputFilename = "C:\\Users\\Veronika\\Documents\\visualisation\\output.txt";
+	string outputEnergyFilename = "C:\\Users\\Veronika\\Documents\\visualisation\\energy.txt";
 
 	double border[4];
 	double timestep;
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
 	fin.close();
 
 	if (generatorEnabled) {
-		particlesFilename = "C:\\Users\\Veronika\\Documents\\GitHub\\discrete-elements\\particles.txt";
+		particlesFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\particles.txt";
 		generateParticlesTriangle(generatorInfoFilename, particlesFilename, border);
 		log << "Particles generation is finished" << endl;
 	}
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 	double energyDiff = 0;
 	double eps = 1e-5;
 
-	exportDetails("C:\\Users\\Veronika\\workspace\\dem\\visualisation\\info.txt", border, system);
+	exportDetails("C:\\Users\\Veronika\\Documents\\visualisation\\info.txt", border, system);
 	log << "Details are exported" << endl;
 
 	ofstream fout(outputFilename);
