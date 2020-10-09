@@ -55,7 +55,7 @@ Vector applyForce(const Particle& particle, std::vector<GridCell>& grid, const d
 	Vector resultant = Vector();
 
 	resultant += applyWeight(particle);
-	resultant += applyAttractionRepulsion(particle, grid);
+	resultant += applyNormalForce(particle, grid);
 	resultant += applyWallRepulsion(particle, border);
 	resultant += applyDissipation(particle);
 
