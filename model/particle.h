@@ -2,6 +2,7 @@
 #include "vector2D.h"
 #include "grid.h"
 #include <vector>
+#include <unordered_map>
 
 struct GridCell;
 
@@ -10,16 +11,19 @@ struct Particle {
 	Vector velocity;
 	int gridRow; // left to right
 	int gridColumn; // bottom to top
-	//size_t gridCellIndex;
+
+	/* Contains the shear force value on the previous step for each neighbouring particle */
+	std::unordered_map<Particle*, double> shearForceAbsolute;
 
 	double radius;
 	double mass;
 
-	//std::vector<double> delta;
 	double deltaWall[4];
 
 	static double stiffnessRepulsive;
 	static double stiffnessAttractive;
+	static double stiffnessShear;
+	static double frictionCoefficient;
 	static double maxRadius;
 	static double criticalDistance;
 	static bool isWallEnabled[4];
