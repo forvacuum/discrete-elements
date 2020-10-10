@@ -11,6 +11,6 @@ constexpr auto g = 9.80665;
 constexpr auto dampingCoefficient = 1;
 
 Vector applyWeight(const Particle&);
-Vector applyAttractionRepulsion(const Particle&, std::vector<GridCell>&);
+Vector applyNormalForce(const Particle&, std::vector<GridCell>&);
 Vector applyWallRepulsion(const Particle&, const double[4]);
 Vector applyDissipation(const Particle&);

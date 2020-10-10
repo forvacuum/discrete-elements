@@ -115,7 +115,7 @@ double elasticParticleEnergy(const Particle& particle, std::vector<GridCell>& gr
 						if (delta > 0) {
 							result += Particle::stiffnessRepulsive * delta * delta / 4;
 						}
-						else if (Particle::isPacked && (-delta) > Particle::criticalDistance) {
+						else if (Particle::isPacked && (-delta) < Particle::criticalDistance) {
 							result += Particle::stiffnessAttractive * delta * delta / 4;
 						}
 
