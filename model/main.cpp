@@ -14,7 +14,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
 
 	string infoFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\info.txt";
-	string particlesFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\particles.txt";
+	string particlesFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\particles.txt";
 	string generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\generatorinfo.txt";
 	string outputFilename = "C:\\Users\\Veronika\\Documents\\visualisation\\output.txt";
 	string outputEnergyFilename = "C:\\Users\\Veronika\\Documents\\visualisation\\energy.txt";

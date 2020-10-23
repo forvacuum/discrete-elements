@@ -8,7 +8,7 @@ void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& gri
 
 	while (it != system.end()) {
 
-		force = applyForce(*it, grid, border);
+		force = applyForce(*it, grid, border, timestep);
 
 		it->position.setX( it->position.getX() + it->velocity.getX() * timestep +
 							(force.getX() / 2 / it->mass) * timestep * timestep );
@@ -37,7 +37,7 @@ void calculateVelocity(std::vector<Particle>& system, std::vector<GridCell>& gri
 	while (it != system.end()) {
 
 		//velocity on the next step
-		force = applyForce(*it, grid, border); //updating the force vector
+		force = applyForce(*it, grid, border, timestep); //updating the force vector
 		it->velocity.setX(it->velocity.getX() + timestep * force.getX() / 2 / it->mass);
 		it->velocity.setY(it->velocity.getY() + timestep * force.getY() / 2 / it->mass);
 
@@ -51,11 +51,12 @@ void calculateNextIteration(std::vector<Particle>& system, std::vector<GridCell>
 }
 
 
-Vector applyForce(const Particle& particle, std::vector<GridCell>& grid, const double border[4]) {
+Vector applyForce(Particle& particle, std::vector<GridCell>& grid, const double border[4], double timestep) {
 	Vector resultant = Vector();
 
 	resultant += applyWeight(particle);
 	resultant += applyNormalForce(particle, grid);
+	resultant += applyShearForce(particle, grid, timestep);
 	resultant += applyWallRepulsion(particle, border);
 	resultant += applyDissipation(particle);
 
@@ -72,8 +73,10 @@ double calculateTotalEnergy(const Particle& particle, const double border[4], st
 	totalEnergy += potentialEnergy(particle, border); 
 
 	/* Elastic (particles) */
-	totalEnergy += elasticParticleEnergy(particle, grid);
+	totalEnergy += normalForceEnergy(particle, grid);
 	
+	//totalEnergy += shearForceEnergy(particle);
+
 	/* Elastic (walls) */
 	totalEnergy += elasticWallEnergy(particle);
 
@@ -88,7 +91,7 @@ double potentialEnergy(const Particle& particle, const double border[4]) {
 	return particle.mass * g * (particle.position.getY() - border[2]);  //reference level is consdered to be exactly the bottom border line
 }
 
-double elasticParticleEnergy(const Particle& particle, std::vector<GridCell>& grid) {
+double normalForceEnergy(const Particle& particle, std::vector<GridCell>& grid) {
 	double result = 0;
 	double delta = 0;
 	size_t cellIndex;
@@ -128,6 +131,19 @@ double elasticParticleEnergy(const Particle& particle, std::vector<GridCell>& gr
 
 	return result;
 }
+
+//double shearForceEnergy(const Particle& particle) {
+//	double result = 0;
+//	double delta;
+//	auto it = particle.shearForceAbsolute.begin();
+//
+//	if (Particle::stiffnessShear != 0)
+//	while (it != particle.shearForceAbsolute.end()) {
+//		//if ()
+//		delta = it->second / Particle::stiffnessShear;
+//		result += Particle::stiffnessShear ;
+//	}
+//}
 
 double elasticWallEnergy(const Particle& particle) {
 	double result = 0;
