@@ -340,3 +340,6 @@ ASALocalRun/
 healthchecksdb
 *.txt
 *.txt
+
+# CMake
+cmake-build-*/
