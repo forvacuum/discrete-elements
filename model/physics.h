@@ -9,11 +9,12 @@ void calculatePosition(std::vector<Particle>&, std::vector<GridCell>& , double, 
 void calculateVelocity(std::vector<Particle>&, std::vector<GridCell>&, double, const double[4]);
 void calculateNextIteration(std::vector<Particle>&, std::vector<GridCell>&, double, const double[4]);
 
-Vector applyForce(const Particle&, std::vector<GridCell>&, const double[4]);
+Vector applyForce(Particle&, std::vector<GridCell>&, const double[4], double);
 
 double calculateTotalEnergy(const Particle&, const double[4], std::vector<GridCell>&);
 
 double kineticEnergy(const Particle&);
 double potentialEnergy(const Particle&, const double[4]);
-double elasticParticleEnergy(const Particle&, std::vector<GridCell>&);
+double normalForceEnergy(const Particle&, std::vector<GridCell>&);
+//double shearForceEnergy(const Particle&);
 double elasticWallEnergy(const Particle&);
