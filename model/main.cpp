@@ -1,26 +1,22 @@
 #include <iostream>
 #include <vector>
 #include <iterator>
-#include <exception>
 
 #include "particle.h"
 #include "impexp.h"
-#include "force.h"
-#include "physics.h"
-#include "grid.h"
 
 using namespace std;
 
 int main(int argc, char* argv[]) {
-
-	string infoFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\info.txt";
-	string particlesFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\particles.txt";
-	string generatorInfoFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\generatorinfo.txt";
-	string outputFilename = "C:\\Users\\Veronika\\Documents\\visualisation\\output.txt";
-	string outputEnergyFilename = "C:\\Users\\Veronika\\Documents\\visualisation\\energy.txt";
+	string infoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\info.txt)";
+    string generatorInfoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\generatorinfo.txt)";
+    string constantsFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\const.txt)";
+	string particlesFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\particles.txt)";
+	string outputFile = R"(C:\Users\Veronika\Documents\visualisation\output.txt)";
+	string outputEnergyFile = R"(C:\Users\Veronika\Documents\visualisation\energy.txt)";
 
 	double border[4];
-	double timestep;
+	double timeStep;
 	double stiffnessRepulsive;
 	double stiffnessAttractive;
 	bool generatorEnabled;
@@ -28,42 +24,17 @@ int main(int argc, char* argv[]) {
 	ofstream log(stdout);
 
 	log << "Program started" << endl;
-
-	/* Parameters initialization */
-
 	log << "Initializing parameters" << endl;
-
-	ifstream fin(infoFilename);
-	for (int i = 0; i < 4; i++) {
-		fin >> border[i];
-	}
-
-	log << "System borders: ";
-	for (int i = 0; i < 4; i++) {
-		log << border[i] << " ";
-	}
-	log << endl;
-
-	fin >> timestep >> stiffnessRepulsive >> stiffnessAttractive >> generatorEnabled;
-
-	log << "Time step: " << timestep << endl;
-	log << "Stiffness on repulsion: " << stiffnessRepulsive << endl;
-	log << "Stiffness on cohesion: " << stiffnessAttractive << endl;
-	log << "Generator enabled: " << generatorEnabled << endl;
-	fin.close();
+	initialize(infoFile, border, timeStep, stiffnessRepulsive, stiffnessAttractive, generatorEnabled);
 
 	if (generatorEnabled) {
-		particlesFilename = "C:\\Users\\Veronika\\Documents\\discrete-elements\\model\\particles.txt";
-		generateParticlesTriangle(generatorInfoFilename, particlesFilename, border);
+		generateParticlesTriangle(generatorInfoFile, particlesFile, border);
 		log << "Particles generation is finished" << endl;
 	}
 
-	/* Model computation algorithm */
 	log << "Starting algorithm" << endl;
-
-	auto system = importParticles(particlesFilename, stiffnessRepulsive, stiffnessAttractive, border);
+	auto system = importParticles(particlesFile, constantsFile, border);
 	GridCell::defaultSize = Particle::maxRadius * 2;
-
 	log << "Particles are imported" << endl;
 
 	auto grid = GridCell::setGrid(border);
@@ -72,51 +43,22 @@ int main(int argc, char* argv[]) {
 	Particle::refreshDeltaWall(grid, border);
 
 	vector<Particle>::iterator it;
-	double preparationTime = 0;
-	double workTime = 0;
-	double totalTime = 0;
-	double systemEnergy = 0;
-	double energyDiff = 0;
-	double eps = 1e-5;
-
-	exportDetails("C:\\Users\\Veronika\\Documents\\visualisation\\info.txt", border, system);
+    double packTime = 0;
+	exportDetails(R"(C:\Users\Veronika\Documents\visualisation\info.txt)", border, system);
 	log << "Details are exported" << endl;
 
-	ofstream fout(outputFilename);
-	ofstream fout_e(outputEnergyFilename);
+	ofstream fout(outputFile);
+	ofstream fout_e(outputEnergyFile);
 
-	do {
-		fout << preparationTime << " ";
-		appendSystemPosition(fout, system);
-		energyDiff = systemEnergy;
-		systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
-		energyDiff -= systemEnergy;
-		calculateNextIteration(system, grid, timestep, border);
-		preparationTime += timestep;
-
-	} while (abs(energyDiff) >= eps || preparationTime < 1);
-
+    packTime = pack(fout, fout_e, system, grid, timeStep, border);
 	log << "Packing is ready" << endl;
 	Particle::isPacked = true;
 	//Particle::isWallEnabled[1] = false;
 	border[1] *= 2;
-	totalTime += preparationTime;
 
-	do {
-		fout << totalTime << " ";
-		appendSystemPosition(fout, system);
-		energyDiff = systemEnergy;
-		systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
-		energyDiff -= systemEnergy;
-		calculateNextIteration(system, grid, timestep, border);
-		workTime += timestep;
-		totalTime += timestep;
-
-	} while (abs(energyDiff) >= eps || workTime < 1);
-
+	execute(fout, fout_e, system, grid, timeStep, packTime, border);
 	fout.close();
-
-	log << "Program model.exe ended succesfully" << endl;
-
+    fout_e.close();
+	log << "Program model.exe ended successfully" << endl;
 	return 0;
 }

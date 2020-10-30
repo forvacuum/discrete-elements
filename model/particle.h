@@ -13,17 +13,19 @@ struct Particle {
 	int gridColumn; // bottom to top
 
 	/* Contains the shear force value on the previous step for each neighbouring particle */
-	std::unordered_map<Particle*, double> shearForceAbsolute;
+    std::unordered_map<Particle*, double> normalForceValue;
+    std::unordered_map<Particle*, double> shearForceValue;
 
 	double radius;
 	double mass;
 
-	double deltaWall[4];
+	double deltaWall[4]{};
 
 	static double stiffnessRepulsive;
 	static double stiffnessAttractive;
 	static double stiffnessShear;
 	static double frictionCoefficient;
+	static double minRadius;
 	static double maxRadius;
 	static double criticalDistance;
 	static bool isWallEnabled[4];
@@ -35,4 +37,5 @@ struct Particle {
 	void refreshGridCoordinates(std::vector<GridCell>&);
 	static void setGridCellPositions(std::vector<Particle>&, const std::vector<GridCell>&);
 	static void refreshDeltaWall(std::vector<GridCell>&, const double[4]);
+	//static std::string getConstants();
 };
