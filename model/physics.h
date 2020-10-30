@@ -5,6 +5,10 @@
 #include "force.h"
 #include "grid.h"
 
+double pack(std::ofstream&, std::ofstream&, std::vector<Particle>&, std::vector<GridCell>& , double, const double[4]);
+double execute(std::ofstream&, std::ofstream&, std::vector<Particle>&, std::vector<GridCell>&,
+        double, double, const double[4]);
+
 void calculatePosition(std::vector<Particle>&, std::vector<GridCell>& , double, const double[4]);
 void calculateVelocity(std::vector<Particle>&, std::vector<GridCell>&, double, const double[4]);
 void calculateNextIteration(std::vector<Particle>&, std::vector<GridCell>&, double, const double[4]);

@@ -1,23 +1,66 @@
 #include "physics.h"
+#include "impexp.h"
+double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
+          std::vector<GridCell>& grid, double timeStep, const double border[4]) {
+    double packTime = 0;
+    double systemEnergy = 0;
+    double energyDiff;
+    double eps = 1e-5;
+
+    do {
+        fout << packTime << " ";
+        appendSystemPosition(fout, system);
+        energyDiff = systemEnergy;
+        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        energyDiff -= systemEnergy;
+        calculateNextIteration(system, grid, timeStep, border);
+        packTime += timeStep;
+
+    } while (abs(energyDiff) >= eps || packTime < 1);
+
+    return packTime;
+}
+
+double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
+            std::vector<GridCell>& grid, double timeStep, double packTime, const double border[4]) {
+    double workTime = 0;
+    double totalTime = packTime;
+    double systemEnergy = 0;
+    double energyDiff;
+    double eps = 1e-5;
+    do {
+        fout << totalTime << " ";
+        appendSystemPosition(fout, system);
+        energyDiff = systemEnergy;
+        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        energyDiff -= systemEnergy;
+        calculateNextIteration(system, grid, timeStep, border);
+        workTime += timeStep;
+        totalTime += timeStep;
+
+    } while (abs(energyDiff) >= eps || workTime < 1);
+
+    return workTime;
+}
 
 // Note: force function is considered not to be dependent on time explicitly
 void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& grid,
-						double timestep, const double border[4]) {
+                       double timeStep, const double border[4]) {
 	Vector force;
 	auto it = system.begin();
 
 	while (it != system.end()) {
 
-		force = applyForce(*it, grid, border, timestep);
+		force = applyForce(*it, grid, border, timeStep);
 
-		it->position.setX( it->position.getX() + it->velocity.getX() * timestep +
-							(force.getX() / 2 / it->mass) * timestep * timestep );
-		it->position.setY( it->position.getY() + it->velocity.getY() * timestep +
-							(force.getY() / 2 / it->mass) * timestep * timestep );
+		it->position.setX(it->position.getX() + it->velocity.getX() * timeStep +
+                          (force.getX() / 2 / it->mass) * timeStep * timeStep );
+		it->position.setY(it->position.getY() + it->velocity.getY() * timeStep +
+                          (force.getY() / 2 / it->mass) * timeStep * timeStep );
 
 		//intermediate velocity
-		it->velocity.setX(it->velocity.getX() + timestep * force.getX() / 2 / it->mass);
-		it->velocity.setY(it->velocity.getY() + timestep * force.getY() / 2 / it->mass);
+		it->velocity.setX(it->velocity.getX() + timeStep * force.getX() / 2 / it->mass);
+		it->velocity.setY(it->velocity.getY() + timeStep * force.getY() / 2 / it->mass);
 
 		it->refreshGridCoordinates(grid);
 

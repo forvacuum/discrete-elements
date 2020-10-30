@@ -2,66 +2,78 @@
 
 using namespace std;
 
-/* This function creates a file named as specified in the argument 'particlesFilename' 
-	containing initial data for given amount of randomly generated particles 
-	
+void initialize(const string& sourceFile,
+                double* border, double& timeStep, double& stiffnessRepulsive,
+                double& stiffnessAttractive, bool& generatorEnabled) {
+    ifstream fin(sourceFile);
+    for (int i = 0; i < 4; i++) {
+        fin >> border[i];
+    }
+
+    fin >> timeStep >> stiffnessRepulsive >> stiffnessAttractive >> generatorEnabled;
+    fin.close();
+}
+
+/* This function creates a file named as specified in the argument 'particlesFilename'
+	containing initial data for given amount of randomly generated particles
+
 	File structure:
-	a(1)	m(1)	x_0(1)	y_0(1)	v_x(1)	v_y(1)		 
+	a(1)	m(1)	x_0(1)	y_0(1)	v_x(1)	v_y(1)
 	...		...		...		...		...		...
 	a(N)	m(N)	x_0(N)	y_0(N)	v_x(N)	v_y(N)		 */
 
-void generateParticlesRandom(string infoFilename, string particlesFilename, double border[4]) {
-	srand(time(0));
+//void generateParticlesRandom(const string& infoFilename, const string& particlesFilename, double border[4]) {
+//	srand(time(0));
+//
+//	size_t amount;
+//	double minRadius;
+//	double maxRadius;
+//	double minMass;
+//	double maxMass;
+//	Vector minVelocity = Vector();
+//	Vector maxVelocity = Vector();
+//	/* Note: Vector instances here are considered more like ranges, i.e.
+//				abscissa has to fit the interval [ minVelocity.x, maxVelocity.x ]
+//				and same for the ordinate */
+//
+//	/* Parameters initialization */
+//
+//	ifstream fin(infoFilename);
+//	fin >> amount >> minRadius >> maxRadius >> minMass >> maxMass;
+//	fin >> minVelocity >> maxVelocity;
+//	fin.close();
+//
+//	/* Particles generation logic */
+//
+//	double currentRadius;
+//	double tmp;
+//
+//	ofstream fout(particlesFilename);
+//
+//	for (unsigned i = 0; i < amount; i++) {
+//		tmp = (double)rand() / RAND_MAX; //random real number in the interval [0, 1)
+//		currentRadius = minRadius + tmp * (maxRadius - minRadius);
+//		fout << currentRadius << " ";
+//
+//		tmp = (double)rand() / RAND_MAX;
+//		fout << minMass + tmp * (maxMass - minMass) << " ";
+//
+//		tmp = (double)rand() / RAND_MAX;
+//		fout << border[0] + currentRadius + tmp * (border[1] - border[0] - 2 * currentRadius) << " ";
+//		tmp = (double)rand() / RAND_MAX;
+//		fout << border[2] + currentRadius + tmp * (border[3] - border[2] - 2 * currentRadius) << " ";
+//
+//		tmp = (double)rand() / RAND_MAX;
+//		fout << minVelocity.getX() + tmp * (maxVelocity.getX() - minVelocity.getX())<< " ";
+//		tmp = (double)rand() / RAND_MAX;
+//		fout << minVelocity.getY() + tmp * (maxVelocity.getY() - minVelocity.getY()) << " ";
+//
+//		fout << endl;
+//	}
+//	fout.close();
+//}
 
-	size_t amount;
-	double minRadius;
-	double maxRadius;
-	double minMass;
-	double maxMass;
-	Vector minVelocity = Vector();
-	Vector maxVelocity = Vector();
-	/* Note: Vector instances here are considered more like ranges, i.e.
-				abscissa has to fit the interval [ minVelocity.x, maxVelocity.x ]
-				and same for the ordinate */
-
-	/* Parameters initialization */
-
-	ifstream fin(infoFilename);
-	fin >> amount >> minRadius >> maxRadius >> minMass >> maxMass;
-	fin >> minVelocity >> maxVelocity;
-	fin.close();
-
-	/* Particles generation logic */
-
-	double currentRadius;
-	double tmp;
-
-	ofstream fout(particlesFilename);
-
-	for (unsigned i = 0; i < amount; i++) {
-		tmp = (double)rand() / RAND_MAX; //random real number in the interval [0, 1)
-		currentRadius = minRadius + tmp * (maxRadius - minRadius);
-		fout << currentRadius << " ";
-
-		tmp = (double)rand() / RAND_MAX;
-		fout << minMass + tmp * (maxMass - minMass) << " ";
-
-		tmp = (double)rand() / RAND_MAX;
-		fout << border[0] + currentRadius + tmp * (border[1] - border[0] - 2 * currentRadius) << " ";
-		tmp = (double)rand() / RAND_MAX;
-		fout << border[2] + currentRadius + tmp * (border[3] - border[2] - 2 * currentRadius) << " ";
-
-		tmp = (double)rand() / RAND_MAX;
-		fout << minVelocity.getX() + tmp * (maxVelocity.getX() - minVelocity.getX())<< " ";
-		tmp = (double)rand() / RAND_MAX;
-		fout << minVelocity.getY() + tmp * (maxVelocity.getY() - minVelocity.getY()) << " ";
-
-		fout << endl;
-	}
-	fout.close();
-}
-
-void generateParticlesTriangle(std::string infoFilename, std::string particlesFilename, double border[4]) {
+void generateParticlesTriangle(const std::string& infoFilename, const std::string& particlesFilename, const double border[4]) {
 	srand(time(0));
 
 	size_t amount;
@@ -114,13 +126,15 @@ void generateParticlesTriangle(std::string infoFilename, std::string particlesFi
 	fout.close();
 }
 
-vector<Particle> importParticles(string filename, double stiffnessRepulsive, double stiffnesCohesive, double border[4]) {
-	ifstream fin(filename);
+vector<Particle> importParticles(const string& sourceFile, const string& constantsFile, double border[4]) {
+	ifstream fin(sourceFile);
+    ifstream fin_const(constantsFile);
 	Particle p;
-	vector<Particle> particle;
+	vector<Particle> system;
 	Vector relativePosition;
 	int peekValue;
 	size_t size;
+	double minRadius;
 	double maxRadius = 0;
 
 	while ((peekValue = fin.peek()) != EOF) {
@@ -130,26 +144,34 @@ vector<Particle> importParticles(string filename, double stiffnessRepulsive, dou
 		else {		
 		fin >> p.radius >> p.mass;
 		fin >> p.position >> p.velocity;
-
+        minRadius = p.radius;
 		if (p.radius > maxRadius) {
 			maxRadius = p.radius;
 		}
+        if (p.radius < minRadius) {
+            minRadius = p.radius;
+        }
 
-		particle.push_back(p);
+		system.push_back(p);
 		}
 	}
 	fin.close();
 
-	size = particle.size();
+	size = system.size();
 
-	Particle::stiffnessRepulsive = stiffnessRepulsive;
-	Particle::stiffnessAttractive = stiffnesCohesive;
+	fin_const >> Particle::stiffnessRepulsive;
+	fin_const >> Particle::stiffnessAttractive;
+	fin_const >> Particle::stiffnessShear;
+	fin_const >> Particle::frictionCoefficient;
+	fin_const >> Particle::criticalDistance;
+
+	Particle::minRadius = minRadius;
 	Particle::maxRadius = maxRadius;
 
-	return particle;
+	return system;
 }
 
-void exportDetails(std::string filename, const double border[4], const vector<Particle> system) {
+void exportDetails(const std::string& filename, const double border[4], const vector<Particle>& system) {
 	ofstream fout(filename);
 	auto it = system.begin();
 

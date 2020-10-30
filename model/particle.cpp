@@ -1,11 +1,12 @@
 #include "particle.h"
 
+double Particle::minRadius = 0;
 double Particle::maxRadius = 0;
 double Particle::stiffnessRepulsive = 0;
 double Particle::stiffnessAttractive = 0;
-double Particle::stiffnessShear = 100;
-double Particle::frictionCoefficient = 10;
-double Particle::criticalDistance = 0.1;
+double Particle::stiffnessShear = 0;
+double Particle::frictionCoefficient = 0;
+double Particle::criticalDistance = 0;
 bool Particle::isWallEnabled[4] = {true, true, true, true};
 bool Particle::isPacked = false;
 
@@ -18,8 +19,8 @@ Particle::Particle() {
 	radius = 0;
 	mass = 0;
 
-	for (int i = 0; i < 4; i++) {
-		deltaWall[i] = 0;
+	for (double & i : deltaWall) {
+		i = 0;
 	}
 }
 
@@ -180,3 +181,13 @@ void Particle::refreshDeltaWall(std::vector<GridCell>& grid, const double border
 		}
 	}
 }
+
+//std::string Particle::getConstants() {
+//    std::string result = "Particle properties:\n";
+//    result += "Repulsive stiffness: " + std::to_string(Particle::stiffnessRepulsive);
+//    result += "\nAttractive stiffness: " +  std::to_string(Particle::stiffnessAttractive);
+//    result += "\nShear stiffness: " +  std::to_string(Particle::stiffnessShear);
+//    result += "\nFriction coefficient: " +  std::to_string(Particle::frictionCoefficient);
+//    result += "\nCritical distance: " +  std::to_string(Particle::criticalDistance);
+//    return result;
+//}
