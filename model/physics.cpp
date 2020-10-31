@@ -3,42 +3,85 @@
 double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
           std::vector<GridCell>& grid, double timeStep, const double border[4]) {
     double packTime = 0;
-    double systemEnergy = 0;
-    double energyDiff;
-    double eps = 1e-5;
+    double positionDiff;
+    double systemPositionNorm = 0;
+    double eps = 1e-6;
 
     do {
         fout << packTime << " ";
+        positionDiff = systemPositionNorm;
         appendSystemPosition(fout, system);
-        energyDiff = systemEnergy;
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
-        energyDiff -= systemEnergy;
+        appendSystemEnergy(fout_e, system, grid, border);
         calculateNextIteration(system, grid, timeStep, border);
+        systemPositionNorm = totalPositionNorm(system);
+        positionDiff -= systemPositionNorm;
         packTime += timeStep;
 
-    } while (abs(energyDiff) >= eps || packTime < 1);
+    } while (abs(positionDiff) >= eps || packTime < 1);
 
     return packTime;
+}
+
+void setNeighbours(std::vector<Particle>& system, std::vector<GridCell>& grid) {
+    size_t cellIndex;
+    double delta;
+    Vector relativePosition;
+    Vector n;
+
+    auto it = system.begin();
+    std::vector<Particle*>::iterator itGrid;
+    std::vector<Particle*>::iterator lastParticle;
+
+    while (it != system.end()) {
+        for (int i = it->gridRow - 1; i <= it->gridRow + 1; i++) {
+            if (i >= 0 && i < GridCell::horizontalAmount) { // checking for row index correctness
+                for (int j = it->gridColumn - 1; j <= it->gridColumn + 1; j++) {
+                    if (j >= 0 && j < GridCell::horizontalAmount) { // checking for column index correctness
+                        cellIndex = i * GridCell::verticalAmount + j;
+
+                        itGrid = grid.at(cellIndex).contents.begin();
+                        lastParticle = grid.at(cellIndex).contents.end();
+
+                        while (itGrid != lastParticle) {
+                            if (*itGrid == &(*it)) {
+                                itGrid++;
+                                continue;
+                            }
+                            relativePosition = it->position - (*itGrid)->position;
+                            delta = it->radius + (*itGrid)->radius - Vector::norm(relativePosition);
+                            if(delta > 0) {
+                                it->neighbour.push_back(*itGrid);
+                            }
+                            itGrid++;
+                        }
+                    }
+                }
+            }
+        }
+        it++;
+    }
 }
 
 double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
             std::vector<GridCell>& grid, double timeStep, double packTime, const double border[4]) {
     double workTime = 0;
     double totalTime = packTime;
-    double systemEnergy = 0;
-    double energyDiff;
-    double eps = 1e-5;
+    double positionDiff;
+    double systemPositionNorm = 0;
+    double eps = 1e-6;
+
     do {
         fout << totalTime << " ";
         appendSystemPosition(fout, system);
-        energyDiff = systemEnergy;
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
-        energyDiff -= systemEnergy;
+        positionDiff = systemPositionNorm;
+        appendSystemEnergy(fout_e, system, grid, border);
         calculateNextIteration(system, grid, timeStep, border);
+        systemPositionNorm = totalPositionNorm(system);
+        positionDiff -= systemPositionNorm;
         workTime += timeStep;
         totalTime += timeStep;
 
-    } while (abs(energyDiff) >= eps || workTime < 1);
+    } while (abs(positionDiff) >= eps || workTime < 1);
 
     return workTime;
 }
@@ -73,33 +116,33 @@ void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& gri
 
 
 void calculateVelocity(std::vector<Particle>& system, std::vector<GridCell>& grid,
-						double timestep, const double border[4]) {
+                       double timeStep, const double border[4]) {
 	Vector force;
 	auto it = system.begin();
 
 	while (it != system.end()) {
 
 		//velocity on the next step
-		force = applyForce(*it, grid, border, timestep); //updating the force vector
-		it->velocity.setX(it->velocity.getX() + timestep * force.getX() / 2 / it->mass);
-		it->velocity.setY(it->velocity.getY() + timestep * force.getY() / 2 / it->mass);
+		force = applyForce(*it, grid, border, timeStep); //updating the force vector
+		it->velocity.setX(it->velocity.getX() + timeStep * force.getX() / 2 / it->mass);
+		it->velocity.setY(it->velocity.getY() + timeStep * force.getY() / 2 / it->mass);
 
 		it++;
 	}
 }
 
-void calculateNextIteration(std::vector<Particle>& system, std::vector<GridCell>& grid, double timestep, const double border[4]) {
-	calculatePosition(system, grid, timestep, border);
-	calculateVelocity(system, grid, timestep, border);
+void calculateNextIteration(std::vector<Particle>& system, std::vector<GridCell>& grid, double timeStep, const double border[4]) {
+	calculatePosition(system, grid, timeStep, border);
+	calculateVelocity(system, grid, timeStep, border);
 }
 
 
-Vector applyForce(Particle& particle, std::vector<GridCell>& grid, const double border[4], double timestep) {
+Vector applyForce(Particle& particle, std::vector<GridCell>& grid, const double border[4], double timeStep) {
 	Vector resultant = Vector();
 
 	resultant += applyWeight(particle);
 	resultant += applyNormalForce(particle, grid);
-	resultant += applyShearForce(particle, grid, timestep);
+	resultant += applyShearForce(particle, grid, timeStep);
 	resultant += applyWallRepulsion(particle, border);
 	resultant += applyDissipation(particle);
 
