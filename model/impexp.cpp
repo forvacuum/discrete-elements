@@ -210,3 +210,13 @@ double appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& syst
 
 	return systemEnergy;
 }
+
+double totalPositionNorm(const vector<Particle>& system) {
+    double result = 0;
+    auto it = system.begin();
+    while (it != system.end()) {
+        result += Vector::norm(it->position);
+        it++;
+    }
+    return result;
+}

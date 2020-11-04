@@ -12,8 +12,11 @@ struct Particle {
 	int gridRow; // left to right
 	int gridColumn; // bottom to top
 
-	/* Contains the shear force value on the previous step for each neighbouring particle */
-    std::unordered_map<Particle*, double> normalForceValue;
+	//TODO: replace vector with an array
+    //std::unordered_map<Particle*, double> neighbour;
+    std::vector<Particle*> neighbour;
+
+    /* Contains the shear force value on the previous step for each neighbouring particle */
     std::unordered_map<Particle*, double> shearForceValue;
 
 	double radius;

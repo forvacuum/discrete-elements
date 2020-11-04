@@ -56,6 +56,7 @@ int main(int argc, char* argv[]) {
 	//Particle::isWallEnabled[1] = false;
 	border[1] *= 2;
 
+	setNeighbours(system, grid);
 	execute(fout, fout_e, system, grid, timeStep, packTime, border);
 	fout.close();
     fout_e.close();

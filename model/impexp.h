@@ -16,3 +16,4 @@ std::vector<Particle> importParticles(const std::string&, const  std::string&, d
 void exportDetails(const std::string&, const double[4], const std::vector<Particle>&);
 void appendSystemPosition(std::ofstream&, const std::vector<Particle>&);
 double appendSystemEnergy(std::ofstream&, const std::vector<Particle>&, std::vector<GridCell>&, const double[4]);
+double totalPositionNorm(const std::vector<Particle> &system);
