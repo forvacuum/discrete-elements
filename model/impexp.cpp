@@ -2,15 +2,15 @@
 
 using namespace std;
 
-void initialize(const string& sourceFile,
-                double* border, double& timeStep, double& stiffnessRepulsive,
-                double& stiffnessAttractive, bool& generatorEnabled) {
-    ifstream fin(sourceFile);
+void initialize(double* border, double& timeStep, bool& generatorEnabled, bool& prePacked, bool& packOnly) {
+    string infoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\info.txt)";
+
+    ifstream fin(infoFile);
     for (int i = 0; i < 4; i++) {
         fin >> border[i];
     }
 
-    fin >> timeStep >> stiffnessRepulsive >> stiffnessAttractive >> generatorEnabled;
+    fin >> timeStep >> generatorEnabled >> prePacked >> packOnly;
     fin.close();
 }
 
@@ -73,7 +73,7 @@ void initialize(const string& sourceFile,
 //	fout.close();
 //}
 
-void generateParticlesTriangle(const std::string& infoFilename, const std::string& particlesFilename, const double border[4]) {
+void generateParticlesTriangle(const string& infoFilename, const string& particlesFilename, const double border[4]) {
 	srand(time(0));
 
 	size_t amount;
@@ -115,7 +115,7 @@ void generateParticlesTriangle(const std::string& infoFilename, const std::strin
 			currentRadius = minRadius + tmp * (maxRadius - minRadius);
 			fout << currentRadius << " " << mass << " " << currentX << " " << currentY << " 0 0" << endl;
 			N++;
-			if (N >= 100) break;
+			if (N >= amount) break;
 			currentX += horizontalStep;
 		}
 
@@ -169,6 +169,19 @@ vector<Particle> importParticles(const string& sourceFile, const string& constan
 	Particle::maxRadius = maxRadius;
 
 	return system;
+}
+
+void exportParticles(const std::string& filename, const vector<Particle>& system) {
+    ofstream fout(filename);
+    auto it = system.begin();
+    bool wtf = fout.is_open();
+    while (it != system.end()) {
+        fout << it->radius << " " << it->mass << " ";
+        fout << it->position << it->velocity << endl;
+        it++;
+    }
+
+    fout.close();
 }
 
 void exportDetails(const std::string& filename, const double border[4], const vector<Particle>& system) {
