@@ -8,7 +8,6 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	string infoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\info.txt)";
     string generatorInfoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\generatorinfo.txt)";
     string constantsFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\const.txt)";
 	string particlesFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\particles.txt)";
@@ -17,16 +16,21 @@ int main(int argc, char* argv[]) {
 
 	double border[4];
 	double timeStep;
-	double stiffnessRepulsive;
-	double stiffnessAttractive;
 	bool generatorEnabled;
+	bool prePacked;
+    bool packOnly;
 
 	ofstream log(stdout);
 
 	log << "Program started" << endl;
 	log << "Initializing parameters" << endl;
-	initialize(infoFile, border, timeStep, stiffnessRepulsive, stiffnessAttractive, generatorEnabled);
+	initialize(border, timeStep, generatorEnabled, prePacked, packOnly);
 
+	if (!packOnly && prePacked) {
+        particlesFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\packed.txt)";
+        generatorEnabled = false;
+        Particle::isPacked = true;
+    }
 	if (generatorEnabled) {
 		generateParticlesTriangle(generatorInfoFile, particlesFile, border);
 		log << "Particles generation is finished" << endl;
@@ -50,14 +54,19 @@ int main(int argc, char* argv[]) {
 	ofstream fout(outputFile);
 	ofstream fout_e(outputEnergyFile);
 
-    packTime = pack(fout, fout_e, system, grid, timeStep, border);
-	log << "Packing is ready" << endl;
-	Particle::isPacked = true;
-	//Particle::isWallEnabled[1] = false;
-	border[1] *= 2;
+	if(!Particle::isPacked) {
+        packTime = pack(fout, fout_e, system, grid, timeStep, border);
+        log << "Packing is ready" << endl;
+        Particle::isPacked = true;
+        exportParticles(R"(C:\Users\Veronika\discrete-elements\auxiliary\packed.txt)", system);
+    }
+	if(!packOnly) {
+        //Particle::isWallEnabled[1] = false;
+        border[1] *= 2;
 
-	setNeighbours(system, grid);
-	execute(fout, fout_e, system, grid, timeStep, packTime, border);
+        setNeighbours(system, grid);
+        execute(fout, fout_e, system, grid, timeStep, packTime, border);
+	}
 	fout.close();
     fout_e.close();
 	log << "Program model.exe ended successfully" << endl;
