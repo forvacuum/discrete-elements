@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	log << "Starting algorithm" << endl;
-	auto system = importParticles(particlesFile, constantsFile, border);
+	auto system = importParticles(particlesFile, constantsFile);
 	GridCell::defaultSize = Particle::maxRadius * 2;
 	log << "Particles are imported" << endl;
 

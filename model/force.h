@@ -16,4 +16,5 @@ Vector applyWeight(const Particle&);
 Vector applyNormalForce(Particle&, std::vector<GridCell>&);
 Vector applyShearForce(Particle&, std::vector<GridCell>&, double timestep);
 Vector applyWallRepulsion(const Particle&, const double[4]);
+Vector applyWallFriction(const Particle&, const double[4]);
 Vector applyDissipation(const Particle&);

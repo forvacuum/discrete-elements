@@ -126,14 +126,13 @@ void generateParticlesTriangle(const string& infoFilename, const string& particl
 	fout.close();
 }
 
-vector<Particle> importParticles(const string& sourceFile, const string& constantsFile, double border[4]) {
+vector<Particle> importParticles(const string &sourceFile, const string &constantsFile) {
 	ifstream fin(sourceFile);
     ifstream fin_const(constantsFile);
 	Particle p;
 	vector<Particle> system;
 	Vector relativePosition;
 	int peekValue;
-	size_t size;
 	double minRadius;
 	double maxRadius = 0;
 
@@ -157,12 +156,12 @@ vector<Particle> importParticles(const string& sourceFile, const string& constan
 	}
 	fin.close();
 
-	size = system.size();
-
 	fin_const >> Particle::stiffnessRepulsive;
 	fin_const >> Particle::stiffnessAttractive;
 	fin_const >> Particle::stiffnessShear;
-	fin_const >> Particle::frictionCoefficient;
+	fin_const >> Particle::particleFriction;
+	fin_const >> Particle::wallFriction;
+	fin_const >> Particle::floorFriction;
 	fin_const >> Particle::criticalDistance;
 
 	Particle::minRadius = minRadius;
@@ -174,7 +173,6 @@ vector<Particle> importParticles(const string& sourceFile, const string& constan
 void exportParticles(const std::string& filename, const vector<Particle>& system) {
     ofstream fout(filename);
     auto it = system.begin();
-    bool wtf = fout.is_open();
     while (it != system.end()) {
         fout << it->radius << " " << it->mass << " ";
         fout << it->position << it->velocity << endl;

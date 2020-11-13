@@ -152,6 +152,7 @@ Vector applyForce(Particle& particle, std::vector<GridCell>& grid, const double 
 	resultant += applyNormalForce(particle, grid);
 	resultant += applyShearForce(particle, grid, timeStep);
 	resultant += applyWallRepulsion(particle, border);
+	resultant += applyWallFriction(particle, border);
 	resultant += applyDissipation(particle);
 
 	return resultant;

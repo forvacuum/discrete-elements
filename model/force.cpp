@@ -110,8 +110,8 @@ Vector applyShearForce(Particle& p, std::vector<GridCell>& grid, double timestep
 									shearForce += Particle::stiffnessShear * deltaShear;
 
 									// Shear force exceeds required value
-									if (shearForce > Particle::frictionCoefficient * normalForce) {
-										shearForce = Particle::frictionCoefficient * normalForce;
+									if (shearForce > Particle::particleFriction * normalForce) {
+										shearForce = Particle::particleFriction * normalForce;
 									}
 
 									p.shearForceValue.at(map_it->first) = shearForce;
@@ -122,8 +122,8 @@ Vector applyShearForce(Particle& p, std::vector<GridCell>& grid, double timestep
 									shearForce = Particle::stiffnessShear * deltaShear;
 
 									// Shear force exceeds required value
-									if (shearForce > Particle::frictionCoefficient * normalForce) {
-										shearForce = Particle::frictionCoefficient * normalForce;
+									if (shearForce > Particle::particleFriction * normalForce) {
+										shearForce = Particle::particleFriction * normalForce;
 									}
 
 									p.shearForceValue.insert(std::make_pair(*it, shearForce));
@@ -164,6 +164,33 @@ Vector applyWallRepulsion(const Particle& p, const double border[4]) {
 	}
 
 	return resultant;
+}
+
+Vector applyWallFriction(const Particle& p, const double border[4]) {
+    double frictionCoefficient = Particle::wallFriction;
+
+    Vector e;
+    Vector resultant = Vector();
+    //TODO: make the variable name more relevant
+    Vector duplicatedBasis[4] = { Vector(0, 1), Vector(0, 1),
+                                  Vector(1, 0), Vector(1, 0) };
+
+    if(!Particle::isPacked) {
+        return resultant;
+    }
+    for (size_t i = 0; i < 4; i++) {
+        if(i == 2) { // if current wall is the bottom one
+            frictionCoefficient = Particle::floorFriction;
+        }
+        if(Particle::isWallEnabled[i] && p.deltaWall[i] > 0 && Vector::norm(p.velocity) != 0) {
+            //project the current velocity vector to a contact plane
+            e = Vector::dotProduct(p.velocity, duplicatedBasis[i]) * duplicatedBasis[i];
+            //normalization and redirecting
+            e = - p.velocity * (1 / Vector::norm(p.velocity));
+            resultant += frictionCoefficient * Particle::stiffnessRepulsive * p.deltaWall[i] * e;
+        }
+    }
+    return resultant;
 }
 
 Vector applyDissipation(const Particle& p) {

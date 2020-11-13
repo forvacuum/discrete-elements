@@ -27,7 +27,9 @@ struct Particle {
 	static double stiffnessRepulsive;
 	static double stiffnessAttractive;
 	static double stiffnessShear;
-	static double frictionCoefficient;
+	static double particleFriction;
+	static double wallFriction;
+	static double floorFriction;
 	static double minRadius;
 	static double maxRadius;
 	static double criticalDistance;

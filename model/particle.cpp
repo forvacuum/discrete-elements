@@ -5,7 +5,9 @@ double Particle::maxRadius = 0;
 double Particle::stiffnessRepulsive = 0;
 double Particle::stiffnessAttractive = 0;
 double Particle::stiffnessShear = 0;
-double Particle::frictionCoefficient = 0;
+double Particle::particleFriction = 0;
+double Particle::wallFriction = 0;
+double Particle::floorFriction = 0;
 double Particle::criticalDistance = 0;
 bool Particle::isWallEnabled[4] = {true, true, true, true};
 bool Particle::isPacked = false;
@@ -187,7 +189,7 @@ void Particle::refreshDeltaWall(std::vector<GridCell>& grid, const double border
 //    result += "Repulsive stiffness: " + std::to_string(Particle::stiffnessRepulsive);
 //    result += "\nAttractive stiffness: " +  std::to_string(Particle::stiffnessAttractive);
 //    result += "\nShear stiffness: " +  std::to_string(Particle::stiffnessShear);
-//    result += "\nFriction coefficient: " +  std::to_string(Particle::frictionCoefficient);
+//    result += "\nFriction coefficient: " +  std::to_string(Particle::particleFriction);
 //    result += "\nCritical distance: " +  std::to_string(Particle::criticalDistance);
 //    return result;
 //}
