@@ -14,7 +14,7 @@ double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& s
         //positionDiff = systemPositionNorm;
         energyDiff = systemEnergy;
         appendSystemPosition(fout, system);
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border, timeStep);
+        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
         calculateNextIteration(system, grid, timeStep, border);
         //systemPositionNorm = totalPositionNorm(system);
         //positionDiff -= systemPositionNorm;
@@ -81,7 +81,7 @@ double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>
         appendSystemPosition(fout, system);
         //positionDiff = systemPositionNorm;
         energyDiff = systemEnergy;
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border, timeStep);
+        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
         calculateNextIteration(system, grid, timeStep, border);
         //systemPositionNorm = totalPositionNorm(system);
         //positionDiff -= systemPositionNorm;
