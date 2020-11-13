@@ -3,21 +3,25 @@
 double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
           std::vector<GridCell>& grid, double timeStep, const double border[4]) {
     double packTime = 0;
-    double positionDiff;
-    double systemPositionNorm = 0;
-    double eps = 1e-6;
+    //double positionDiff;
+    double energyDiff;
+    //double systemPositionNorm = 0;
+    double systemEnergy = 0;
+    double eps = 1e-7;
 
     do {
         fout << packTime << " ";
-        positionDiff = systemPositionNorm;
+        //positionDiff = systemPositionNorm;
+        energyDiff = systemEnergy;
         appendSystemPosition(fout, system);
-        appendSystemEnergy(fout_e, system, grid, border);
+        systemEnergy = appendSystemEnergy(fout_e, system, grid, border, timeStep);
         calculateNextIteration(system, grid, timeStep, border);
-        systemPositionNorm = totalPositionNorm(system);
-        positionDiff -= systemPositionNorm;
+        //systemPositionNorm = totalPositionNorm(system);
+        //positionDiff -= systemPositionNorm;
+        energyDiff -= systemEnergy;
         packTime += timeStep;
 
-    } while (abs(positionDiff) >= eps || packTime < 1);
+    } while (abs(energyDiff) >= eps || packTime < 1);
 
     return packTime;
 }
@@ -66,27 +70,31 @@ double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>
             std::vector<GridCell>& grid, double timeStep, double packTime, const double border[4]) {
     double workTime = 0;
     double totalTime = packTime;
-    double positionDiff;
-    double systemPositionNorm = 0;
+    //double positionDiff;
+    double energyDiff;
+    //double systemPositionNorm = 0;
+    double systemEnergy = 0;
     double eps = 1e-6;
 
     do {
         fout << totalTime << " ";
         appendSystemPosition(fout, system);
-        positionDiff = systemPositionNorm;
-        appendSystemEnergy(fout_e, system, grid, border);
+        //positionDiff = systemPositionNorm;
+        energyDiff = systemEnergy;
+        systemEnergy = appendSystemEnergy(fout_e, system, grid, border, timeStep);
         calculateNextIteration(system, grid, timeStep, border);
-        systemPositionNorm = totalPositionNorm(system);
-        positionDiff -= systemPositionNorm;
+        //systemPositionNorm = totalPositionNorm(system);
+        //positionDiff -= systemPositionNorm;
+        energyDiff -= systemEnergy;
         workTime += timeStep;
         totalTime += timeStep;
 
-    } while (abs(positionDiff) >= eps || workTime < 1);
+    } while (abs(energyDiff) >= eps || workTime < 1);
 
     return workTime;
 }
 
-// Note: force function is considered not to be dependent on time explicitly
+// Note: force function is considered not to depend on time explicitly
 void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& grid,
                        double timeStep, const double border[4]) {
 	Vector force;
