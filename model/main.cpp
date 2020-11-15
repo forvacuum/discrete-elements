@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	Particle::refreshDeltaWall(grid, border);
 
 	vector<Particle>::iterator it;
-    double packTime = 0;
+    double time = 0;
 	exportDetails(R"(C:\Users\Veronika\Documents\visualisation\info.txt)", border, system);
 	log << "Details are exported" << endl;
 
@@ -55,17 +55,20 @@ int main(int argc, char* argv[]) {
 	ofstream fout_e(outputEnergyFile);
 
 	if(!Particle::isPacked) {
-        packTime = pack(fout, fout_e, system, grid, timeStep, border);
+        time = pack(fout, fout_e, system, grid, timeStep, border);
         log << "Packing is ready" << endl;
         Particle::isPacked = true;
         exportParticles(R"(C:\Users\Veronika\discrete-elements\auxiliary\packed.txt)", system);
     }
+    fout << time << " ";
+    appendSystemPosition(fout, system);
 	if(!packOnly) {
         //Particle::isWallEnabled[1] = false;
         border[1] *= 2;
-
         setNeighbours(system, grid);
-        execute(fout, fout_e, system, grid, timeStep, packTime, border);
+        execute(fout, fout_e, system, grid, timeStep, time, border);
+        fout << time << " ";
+        appendSystemPosition(fout, system);
 	}
 	fout.close();
     fout_e.close();

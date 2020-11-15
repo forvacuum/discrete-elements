@@ -16,7 +16,9 @@ void calculateNextIteration(std::vector<Particle>&, std::vector<GridCell>&, doub
 
 Vector applyForce(Particle&, std::vector<GridCell>&, const double[4], double);
 
+double calculateEnergyRelation(const std::vector<Particle>&, const double[4]);
 double calculateTotalEnergy(const Particle&, const double[4], std::vector<GridCell>&);
+double calculateTotalSystemEnergy(const std::vector<Particle>&, const double[4], std::vector<GridCell>&);
 
 double kineticEnergy(const Particle&);
 double potentialEnergy(const Particle&, const double[4]);

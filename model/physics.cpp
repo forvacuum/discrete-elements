@@ -10,11 +10,12 @@ double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& s
     double eps = 1e-7;
 
     do {
-        fout << packTime << " ";
+        //fout << packTime << " ";
         //positionDiff = systemPositionNorm;
         energyDiff = systemEnergy;
-        appendSystemPosition(fout, system);
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        //appendSystemPosition(fout, system);
+        //systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        systemEnergy = calculateTotalSystemEnergy(system, border, grid);
         calculateNextIteration(system, grid, timeStep, border);
         //systemPositionNorm = totalPositionNorm(system);
         //positionDiff -= systemPositionNorm;
@@ -74,22 +75,23 @@ double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>
     double energyDiff;
     //double systemPositionNorm = 0;
     double systemEnergy = 0;
-    double eps = 1e-6;
+    double eps = 1e-7;
 
     do {
-        fout << totalTime << " ";
-        appendSystemPosition(fout, system);
+        //fout << totalTime << " ";
+        //appendSystemPosition(fout, system);
         //positionDiff = systemPositionNorm;
-        energyDiff = systemEnergy;
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        //energyDiff = systemEnergy;
+        //systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        //systemEnergy = calculateTotalSystemEnergy(system, border, grid);
         calculateNextIteration(system, grid, timeStep, border);
         //systemPositionNorm = totalPositionNorm(system);
         //positionDiff -= systemPositionNorm;
-        energyDiff -= systemEnergy;
+        //energyDiff -= systemEnergy;
         workTime += timeStep;
         totalTime += timeStep;
 
-    } while (abs(energyDiff) >= eps || workTime < 1);
+    } while (abs(calculateEnergyRelation(system, border)) >= eps || workTime < 1);
 
     return workTime;
 }
@@ -158,6 +160,21 @@ Vector applyForce(Particle& particle, std::vector<GridCell>& grid, const double 
 	return resultant;
 }
 
+double calculateEnergyRelation(const std::vector<Particle>& system, const double border[4]) {
+    auto it = system.begin();
+    double result = 0;
+    double kinetic = 0;
+    double potential = 0;
+
+    while (it != system.end()) {
+        kinetic += kineticEnergy(*it);
+        potential += potentialEnergy(*it, border);
+        it++;
+    }
+
+    return kinetic / potential;
+}
+
 double calculateTotalEnergy(const Particle& particle, const double border[4], std::vector<GridCell>& grid) {
 	double totalEnergy = 0;
 
@@ -176,6 +193,20 @@ double calculateTotalEnergy(const Particle& particle, const double border[4], st
 	totalEnergy += elasticWallEnergy(particle);
 
 	return totalEnergy;
+}
+
+double calculateTotalSystemEnergy(const std::vector<Particle>& system, const double border[4], std::vector<GridCell>& grid) {
+    auto it = system.begin();
+    double systemEnergy = 0;
+    double tmp;
+
+    while (it != system.end()) {
+        tmp = calculateTotalEnergy(*it, border, grid);
+        systemEnergy += tmp;
+        it++;
+    }
+
+    return systemEnergy;
 }
 
 double kineticEnergy(const Particle& particle) {
