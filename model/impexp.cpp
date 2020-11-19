@@ -1,7 +1,18 @@
 #include "impexp.h"
-#include "parameter.h"
 
 using namespace std;
+
+void initialize(double* border, double& timeStep, bool& generatorEnabled, bool& prePacked, bool& packOnly) {
+    string infoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\info.txt)";
+
+    ifstream fin(infoFile);
+    for (int i = 0; i < 4; i++) {
+        fin >> border[i];
+    }
+
+    fin >> timeStep >> generatorEnabled >> prePacked >> packOnly;
+    fin.close();
+}
 
 /* This function creates a file named as specified in the argument 'particlesFilename'
 	containing initial data for given amount of randomly generated particles
@@ -195,7 +206,7 @@ void appendSystemPosition(std::ofstream& fout, const std::vector<Particle>& syst
 	fout << endl;
 }
 
-double appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, Grid& grid, const double border[4]) {
+double appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, std::vector<GridCell>& grid, const double border[4]) {
 	auto it = system.begin();
 	double systemEnergy = 0;
 	double tmp;

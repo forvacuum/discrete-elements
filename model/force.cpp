@@ -1,11 +1,10 @@
 #include "force.h"
-#include "grid.h"
 
 Vector applyWeight(const Particle& p) {
 	return (- p.mass * g * Vector(0, 1));
 }
 
-Vector applyNormalForce(Particle& p, Grid& grid) {
+Vector applyNormalForce(Particle& p, std::vector<GridCell>& grid) {
 	Vector resultant = Vector();
 	Vector relativePosition;
 	Vector n;
@@ -17,10 +16,10 @@ Vector applyNormalForce(Particle& p, Grid& grid) {
 
 	/* Iterating through all particles in adjacent grid cells */
 	for (int i = p.gridRow - 1; i <= p.gridRow + 1; i++) {
-		if (i >= 0 && i < grid.horizontalAmount) {
+		if (i >= 0 && i < GridCell::horizontalAmount) { 
 			for (int j = p.gridColumn - 1; j <= p.gridColumn + 1; j++) {
-				if (j >= 0 && j < grid.horizontalAmount) {
-					cellIndex = i * grid.verticalAmount + j;
+				if (j >= 0 && j < GridCell::horizontalAmount) {
+					cellIndex = i * GridCell::verticalAmount + j;
 
 					it = grid.at(cellIndex).contents.begin();
 					lastParticle = grid.at(cellIndex).contents.end();
@@ -52,7 +51,7 @@ Vector applyNormalForce(Particle& p, Grid& grid) {
 	return resultant;
 }
 
-Vector applyShearForce(Particle& p, Grid& grid, double timestep) {
+Vector applyShearForce(Particle& p, std::vector<GridCell>& grid, double timestep) {
 	Vector resultant = Vector();
 	Vector relativePosition;
 	Vector relativeVelocity;
@@ -74,10 +73,10 @@ Vector applyShearForce(Particle& p, Grid& grid, double timestep) {
 
 //	 Iterating through all particles in adjacent grid cells
 	for (int i = p.gridRow - 1; i <= p.gridRow + 1; i++) {
-		if (i >= 0 && i < grid.horizontalAmount) { // checking for row index correctness
+		if (i >= 0 && i < GridCell::horizontalAmount) { // checking for row index correctness
 			for (int j = p.gridColumn - 1; j <= p.gridColumn + 1; j++) {
-				if (j >= 0 && j < grid.horizontalAmount) { // checking for column index correctness
-					cellIndex = i * grid.verticalAmount + j;
+				if (j >= 0 && j < GridCell::horizontalAmount) { // checking for column index correctness
+					cellIndex = i * GridCell::verticalAmount + j; 
 
 					it = grid.at(cellIndex).contents.begin();
 					lastParticle = grid.at(cellIndex).contents.end();

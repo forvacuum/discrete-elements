@@ -4,7 +4,6 @@
 
 #include "particle.h"
 #include "impexp.h"
-#include "parameter.h"
 
 using namespace std;
 
@@ -16,7 +15,6 @@ int main(int argc, char* argv[]) {
 	string outputEnergyFile = R"(C:\Users\Veronika\Documents\visualisation\energy.txt)";
 
 	double border[4];
-	double* workspace;
 	double timeStep;
 	bool generatorEnabled;
 	bool prePacked;
@@ -27,7 +25,6 @@ int main(int argc, char* argv[]) {
 	log << "Program started" << endl;
 	log << "Initializing parameters" << endl;
 	initialize(border, timeStep, generatorEnabled, prePacked, packOnly);
-    workspace = setWorkspace(border);
 
 	if (!packOnly && prePacked) {
         particlesFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\packed.txt)";
@@ -39,17 +36,15 @@ int main(int argc, char* argv[]) {
 		log << "Particles generation is finished" << endl;
 	}
 
-    log << "Algorithm is started" << endl;
-    auto system = importParticles(particlesFile, constantsFile);
-
+	log << "Starting algorithm" << endl;
+	auto system = importParticles(particlesFile, constantsFile);
+	GridCell::defaultSize = Particle::maxRadius * 2;
 	log << "Particles are imported" << endl;
 
-    GridCell::defaultSize = Particle::maxRadius * 2;
-	Grid grid(workspace);
+	auto grid = GridCell::setGrid(border);
 	Particle::setGridCellPositions(system, grid);
 	GridCell::setCellsContents(grid, system);
 	Particle::refreshDeltaWall(grid, border);
-	log << "Grid is set" << endl;
 
 	vector<Particle>::iterator it;
     double time = 0;
@@ -68,8 +63,8 @@ int main(int argc, char* argv[]) {
     fout << time << " ";
     appendSystemPosition(fout, system);
 	if(!packOnly) {
-        Particle::isWallEnabled[1] = false;
-        //border[1] *= 2; //does not work properly
+        //Particle::isWallEnabled[1] = false;
+        border[1] *= 2;
         setNeighbours(system, grid);
         execute(fout, fout_e, system, grid, timeStep, time, border);
         fout << time << " ";

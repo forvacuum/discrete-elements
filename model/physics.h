@@ -5,23 +5,23 @@
 #include "force.h"
 #include "grid.h"
 
-double pack(std::ofstream&, std::ofstream&, std::vector<Particle>&, Grid& , double, const double[4]);
-void setNeighbours(std::vector<Particle>&, Grid&);
-double execute(std::ofstream&, std::ofstream&, std::vector<Particle>&, Grid&,
+double pack(std::ofstream&, std::ofstream&, std::vector<Particle>&, std::vector<GridCell>& , double, const double[4]);
+void setNeighbours(std::vector<Particle>&, std::vector<GridCell>&);
+double execute(std::ofstream&, std::ofstream&, std::vector<Particle>&, std::vector<GridCell>&,
         double, double, const double[4]);
 
-void calculatePosition(std::vector<Particle>&, Grid&, double, const double[4]);
-void calculateVelocity(std::vector<Particle>&, Grid&, double, const double[4]);
-void calculateNextIteration(std::vector<Particle>&, Grid&, double, const double[4]);
+void calculatePosition(std::vector<Particle>&, std::vector<GridCell>&, double, const double[4]);
+void calculateVelocity(std::vector<Particle>&, std::vector<GridCell>&, double, const double[4]);
+void calculateNextIteration(std::vector<Particle>&, std::vector<GridCell>&, double, const double[4]);
 
-Vector applyForce(Particle&, Grid&, const double[4], double);
+Vector applyForce(Particle&, std::vector<GridCell>&, const double[4], double);
 
 double calculateEnergyRelation(const std::vector<Particle>&, const double[4]);
-double calculateTotalEnergy(const Particle&, const double[4], Grid&);
-double calculateTotalSystemEnergy(const std::vector<Particle>&, const double[4], Grid&);
+double calculateTotalEnergy(const Particle&, const double[4], std::vector<GridCell>&);
+double calculateTotalSystemEnergy(const std::vector<Particle>&, const double[4], std::vector<GridCell>&);
 
 double kineticEnergy(const Particle&);
 double potentialEnergy(const Particle&, const double[4]);
-double normalForceEnergy(const Particle&, Grid&);
+double normalForceEnergy(const Particle&, std::vector<GridCell>&);
 //double shearForceEnergy(const Particle&);
 double elasticWallEnergy(const Particle&);
