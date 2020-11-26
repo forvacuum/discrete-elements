@@ -10,7 +10,7 @@
 #include "grid.h"
 
 constexpr auto g = 9.80665;
-constexpr auto dampingCoefficient = 1;
+constexpr auto dampingCoefficient = 10;
 
 struct Particle;
 struct Grid;
@@ -18,6 +18,8 @@ struct Grid;
 Vector applyWeight(const Particle&);
 Vector applyNormalForce(Particle&, Grid&);
 Vector applyShearForce(Particle&, Grid&, double);
-Vector applyWallRepulsion(const Particle&, const double[4]);
-Vector applyWallFriction(const Particle&, const double[4]);
+Vector applyWallRepulsion(const Particle &p);
+Vector applyWallFriction(const Particle &p);
 Vector applyDissipation(const Particle&);
+
+Vector applyForce(Particle&, Grid&, const double[4], double);

@@ -41,6 +41,6 @@ struct Particle {
 	bool operator==(const Particle&) const;
 	bool operator!=(const Particle&) const;
 	void refreshGridCoordinates(Grid&, const double[4]);
-	static void setGridCellPositions(std::vector<Particle>&, const Grid&);
-	static void refreshDeltaWall(Grid&, const double[4]);
+    static void setGridCellPositions(std::vector<Particle>&, Grid& grid);
+    static void refreshDeltaWall(Grid&, const double[4]);
 };

@@ -7,7 +7,7 @@
 #include <iterator>
 #include "vector2D.h"
 #include "particle.h"
-#include "physics.h"
+#include "energy.h"
 
 void initialize(double*, double&, bool&, bool&, bool&);
 double* setWorkspace(const double[]);

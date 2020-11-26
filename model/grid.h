@@ -21,10 +21,10 @@ struct GridCell {
 	GridCell(double, double);
 	void addParticle(Particle*);
 	void removeParticle(Particle*);
-	static void setCellsContents(Grid&, std::vector<Particle>&);
 	static double getPreferredSize(double);
 };
 
+// Add particles system as a class member
 struct Grid {
     std::vector<GridCell> grid;
     size_t horizontalAmount;
@@ -33,6 +33,7 @@ struct Grid {
 
     Grid(double*);
     GridCell& at(size_t);
+    void setCellsContents(std::vector<Particle>&);
 
 private:
     std::vector<GridCell> setGrid(const double[4]);

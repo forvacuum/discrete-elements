@@ -4,7 +4,8 @@
 
 #include "particle.h"
 #include "impexp.h"
-#include "parameter.h"
+#include "comp.h"
+#include "grid.h"
 
 using namespace std;
 
@@ -24,10 +25,10 @@ int main(int argc, char* argv[]) {
 
 	ofstream log(stdout);
 
-	log << "Program started" << endl;
-	log << "Initializing parameters" << endl;
+	log << "Start of " << argv[0] << endl;
 	initialize(border, timeStep, generatorEnabled, prePacked, packOnly);
     workspace = setWorkspace(border);
+    log << "Parameters are initialized" << endl;
 
 	if (!packOnly && prePacked) {
         particlesFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\packed.txt)";
@@ -47,7 +48,7 @@ int main(int argc, char* argv[]) {
     GridCell::defaultSize = Particle::maxRadius * 2;
 	Grid grid(workspace);
 	Particle::setGridCellPositions(system, grid);
-	GridCell::setCellsContents(grid, system);
+	grid.setCellsContents(system);
 	Particle::refreshDeltaWall(grid, border);
 	log << "Grid is set" << endl;
 
@@ -69,7 +70,6 @@ int main(int argc, char* argv[]) {
     appendSystemPosition(fout, system);
 	if(!packOnly) {
         Particle::isWallEnabled[1] = false;
-        //border[1] *= 2; //does not work properly
         setNeighbours(system, grid);
         execute(fout, fout_e, system, grid, timeStep, time, border);
         fout << time << " ";
@@ -77,6 +77,7 @@ int main(int argc, char* argv[]) {
 	}
 	fout.close();
     fout_e.close();
-	log << "Program model.exe ended successfully" << endl;
+
+	log << argv[0] << "ended successfully" << endl;
 	return 0;
 }

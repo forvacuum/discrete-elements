@@ -1,5 +1,7 @@
+#include "comp.h"
+#include "impexp.h"
+#include "energy.h"
 #include "force.h"
-#include "grid.h"
 
 Vector applyWeight(const Particle& p) {
 	return (- p.mass * g * Vector(0, 1));
@@ -14,18 +16,19 @@ Vector applyNormalForce(Particle& p, Grid& grid) {
 
 	std::vector<Particle*>::iterator it;
 	std::vector<Particle*>::iterator lastParticle;
+    std::vector<Particle*>::iterator it_tmp;
 
 	/* Iterating through all particles in adjacent grid cells */
 	for (int i = p.gridRow - 1; i <= p.gridRow + 1; i++) {
 		if (i >= 0 && i < grid.horizontalAmount) {
 			for (int j = p.gridColumn - 1; j <= p.gridColumn + 1; j++) {
-				if (j >= 0 && j < grid.horizontalAmount) {
+				if (j >= 0 && j < grid.verticalAmount) {
 					cellIndex = i * grid.verticalAmount + j;
 
 					it = grid.at(cellIndex).contents.begin();
 					lastParticle = grid.at(cellIndex).contents.end();
 
-					while (it != lastParticle) {
+					while (it != lastParticle) { // Excluding the particle itself
 					    if (*it == &p) {
                             it++;
                             continue;
@@ -35,13 +38,24 @@ Vector applyNormalForce(Particle& p, Grid& grid) {
 						n = relativePosition * (1 / Vector::norm(relativePosition));
 						delta = p.radius + (*it)->radius - Vector::norm(relativePosition);
 
+						// Particles are in contact -> the force is repulsive
 						if (delta >= 0) {
 							resultant += Particle::stiffnessRepulsive * delta * n;
 						}
+						/* Attractive force
+						 * Only for packed system
+						 * Only for initially neighbouring particles
+						 * Acting only at low distances
+						 * */
 						else if (Particle::isPacked && (-delta) < Particle::criticalDistance
 						&& std::find(p.neighbour.begin(), p.neighbour.end(), *it) != p.neighbour.end()) {
 							//delta here is a negative value so the force direction will be reversed
 							resultant += Particle::stiffnessAttractive * delta * n;
+						}
+						// Removing neighbour when the distance exceeds some critical value
+						else if( (-delta) >= Particle::criticalDistance
+                                 && (it_tmp = std::find(p.neighbour.begin(), p.neighbour.end(), *it)) != p.neighbour.end()) {
+						    p.neighbour.erase(it_tmp);
 						}
 						it++;
 					}
@@ -52,7 +66,7 @@ Vector applyNormalForce(Particle& p, Grid& grid) {
 	return resultant;
 }
 
-Vector applyShearForce(Particle& p, Grid& grid, double timestep) {
+Vector applyShearForce(Particle& p, Grid& grid, double timeStep) {
 	Vector resultant = Vector();
 	Vector relativePosition;
 	Vector relativeVelocity;
@@ -76,7 +90,7 @@ Vector applyShearForce(Particle& p, Grid& grid, double timestep) {
 	for (int i = p.gridRow - 1; i <= p.gridRow + 1; i++) {
 		if (i >= 0 && i < grid.horizontalAmount) { // checking for row index correctness
 			for (int j = p.gridColumn - 1; j <= p.gridColumn + 1; j++) {
-				if (j >= 0 && j < grid.horizontalAmount) { // checking for column index correctness
+				if (j >= 0 && j < grid.verticalAmount) { // checking for column index correctness
 					cellIndex = i * grid.verticalAmount + j;
 
 					it = grid.at(cellIndex).contents.begin();
@@ -100,7 +114,7 @@ Vector applyShearForce(Particle& p, Grid& grid, double timestep) {
 							relativeShearVelocity = relativeVelocity - Vector::dotProduct(relativeVelocity, n) * n;
 							if (Vector::norm(relativeShearVelocity) != 0) { //excluding the case of zero division
 								t = relativeShearVelocity * (1 / Vector::norm(relativeShearVelocity));
-								deltaShear = Vector::norm(relativeShearVelocity) * timestep;
+								deltaShear = Vector::norm(relativeShearVelocity) * timeStep;
 								normalForce = Particle::stiffnessRepulsive * deltaNormal;
 
 								map_it = p.shearForceValue.find(*it);
@@ -134,11 +148,11 @@ Vector applyShearForce(Particle& p, Grid& grid, double timestep) {
 							}
 						}
 
-						// Given particles do not contact anymore
+						// When two given particles do not contact anymore
 						else {
                             map_it = p.shearForceValue.find(*it);
                             // Current particle has to be excluded from the map
-                            //      if it stopped affecting on an initial one
+                            //      if it stopped affecting on the initial one
                             if (map_it != p.shearForceValue.end()) {
                                 p.shearForceValue.erase(map_it);
                             }
@@ -153,7 +167,7 @@ Vector applyShearForce(Particle& p, Grid& grid, double timestep) {
 	return resultant;
 }
 
-Vector applyWallRepulsion(const Particle& p, const double border[4]) {
+Vector applyWallRepulsion(const Particle &p) {
 	Vector resultant = Vector();
 	Vector duplicatedBasis[4] = { Vector(1, 0), Vector(1, 0),
 								Vector(0, 1), Vector(0, 1) };
@@ -167,7 +181,7 @@ Vector applyWallRepulsion(const Particle& p, const double border[4]) {
 	return resultant;
 }
 
-Vector applyWallFriction(const Particle& p, const double border[4]) {
+Vector applyWallFriction(const Particle &p) {
     double frictionCoefficient = Particle::wallFriction;
 
     Vector e;
@@ -196,4 +210,17 @@ Vector applyWallFriction(const Particle& p, const double border[4]) {
 
 Vector applyDissipation(const Particle& p) {
 	return - dampingCoefficient * Vector(p.velocity);
+}
+
+Vector applyForce(Particle& particle, Grid& grid, const double border[4], double timeStep) {
+	Vector resultant = Vector();
+
+	resultant += applyWeight(particle);
+	resultant += applyNormalForce(particle, grid);
+	resultant += applyShearForce(particle, grid, timeStep);
+	resultant += applyWallRepulsion(particle);
+	resultant += applyWallFriction(particle);
+	resultant += applyDissipation(particle);
+
+	return resultant;
 }

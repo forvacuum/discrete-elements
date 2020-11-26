@@ -82,26 +82,26 @@ void Particle::refreshGridCoordinates(Grid& grid, const double border[4]) {
 	}
 }
 
-void Particle::setGridCellPositions(std::vector<Particle>& system, const Grid& grid) {
-	auto it = system.begin();
-	int i = 0;
-	int j = 0;
+void Particle::setGridCellPositions(std::vector<Particle> &system, Grid& grid) {
+    auto it = system.begin();
+    int i = 0;
+    int j = 0;
 
-	while (it != system.end()) {
-		while (grid.workspaceBorder[0] + i * GridCell::width < it->position.getX()) {
-			i++;
-		}
-		i--;
-		
-		while (grid.workspaceBorder[2] + j * GridCell::height < it->position.getY()) {
-			j++;
-		}
-		j--;
+    while (it != system.end()) {
+        while (grid.workspaceBorder[0] + i * GridCell::width < it->position.getX()) {
+            i++;
+        }
+        i--;
 
-		it->gridRow = i;
-		it->gridColumn = j;
-		it++;
-	}
+        while (grid.workspaceBorder[2] + j * GridCell::height < it->position.getY()) {
+            j++;
+        }
+        j--;
+
+        it->gridRow = i;
+        it->gridColumn = j;
+        it++;
+    }
 }
 
 //TODO: move the calculations of border coordinates somewhere else

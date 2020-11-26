@@ -1,119 +1,8 @@
 #include "impexp.h"
 #include "parameter.h"
+#include "comp.h"
 
 using namespace std;
-
-/* This function creates a file named as specified in the argument 'particlesFilename'
-	containing initial data for given amount of randomly generated particles
-
-	File structure:
-	a(1)	m(1)	x_0(1)	y_0(1)	v_x(1)	v_y(1)
-	...		...		...		...		...		...
-	a(N)	m(N)	x_0(N)	y_0(N)	v_x(N)	v_y(N)		 */
-
-//void generateParticlesRandom(const string& infoFilename, const string& particlesFilename, double border[4]) {
-//	srand(time(0));
-//
-//	size_t amount;
-//	double minRadius;
-//	double maxRadius;
-//	double minMass;
-//	double maxMass;
-//	Vector minVelocity = Vector();
-//	Vector maxVelocity = Vector();
-//	/* Note: Vector instances here are considered more like ranges, i.e.
-//				abscissa has to fit the interval [ minVelocity.x, maxVelocity.x ]
-//				and same for the ordinate */
-//
-//	/* Parameters initialization */
-//
-//	ifstream fin(infoFilename);
-//	fin >> amount >> minRadius >> maxRadius >> minMass >> maxMass;
-//	fin >> minVelocity >> maxVelocity;
-//	fin.close();
-//
-//	/* Particles generation logic */
-//
-//	double currentRadius;
-//	double tmp;
-//
-//	ofstream fout(particlesFilename);
-//
-//	for (unsigned i = 0; i < amount; i++) {
-//		tmp = (double)rand() / RAND_MAX; //random real number in the interval [0, 1)
-//		currentRadius = minRadius + tmp * (maxRadius - minRadius);
-//		fout << currentRadius << " ";
-//
-//		tmp = (double)rand() / RAND_MAX;
-//		fout << minMass + tmp * (maxMass - minMass) << " ";
-//
-//		tmp = (double)rand() / RAND_MAX;
-//		fout << border[0] + currentRadius + tmp * (border[1] - border[0] - 2 * currentRadius) << " ";
-//		tmp = (double)rand() / RAND_MAX;
-//		fout << border[2] + currentRadius + tmp * (border[3] - border[2] - 2 * currentRadius) << " ";
-//
-//		tmp = (double)rand() / RAND_MAX;
-//		fout << minVelocity.getX() + tmp * (maxVelocity.getX() - minVelocity.getX())<< " ";
-//		tmp = (double)rand() / RAND_MAX;
-//		fout << minVelocity.getY() + tmp * (maxVelocity.getY() - minVelocity.getY()) << " ";
-//
-//		fout << endl;
-//	}
-//	fout.close();
-//}
-
-void generateParticlesTriangle(const string& infoFilename, const string& particlesFilename, const double border[4]) {
-	srand(time(0));
-
-	size_t amount;
-	size_t N = 0;
-	size_t rowCounter = 0;
-
-	double minRadius;
-	double maxRadius;
-	double currentRadius;
-	double tmp;
-
-	double mass;
-
-	double currentX;
-	double currentY;
-	double horizontalStep;
-	double verticalStep;
-
-	ifstream fin(infoFilename);
-	fin >> amount >> minRadius >> maxRadius >> mass;
-	fin.close();
-
-	currentY = border[2] + maxRadius;
-	horizontalStep = 2 * maxRadius;
-	verticalStep = sqrt(3) * maxRadius;
-
-	ofstream fout(particlesFilename);
-	while (N < amount) {
-
-		if (rowCounter % 2 == 0) {
-			currentX = border[0] + maxRadius;
-		}
-		else {
-			currentX = border[0] + 2 * maxRadius;
-		}
-
-		while (currentX < border[1] - maxRadius) {
-			tmp = (double)rand() / RAND_MAX; //random real number in the interval [0, 1)
-			currentRadius = minRadius + tmp * (maxRadius - minRadius);
-			fout << currentRadius << " " << mass << " " << currentX << " " << currentY << " 0 0" << endl;
-			N++;
-			if (N >= amount) break;
-			currentX += horizontalStep;
-		}
-
-		rowCounter++;
-		currentY += verticalStep;
-	}
-
-	fout.close();
-}
 
 vector<Particle> importParticles(const string &sourceFile, const string &constantsFile) {
 	ifstream fin(sourceFile);
@@ -122,6 +11,7 @@ vector<Particle> importParticles(const string &sourceFile, const string &constan
 	vector<Particle> system;
 	Vector relativePosition;
 	int peekValue;
+	double density;
 	double minRadius;
 	double maxRadius = 0;
 
@@ -129,10 +19,11 @@ vector<Particle> importParticles(const string &sourceFile, const string &constan
 		if (peekValue == ' ' || peekValue == '\n') {
 			fin.get();
 		}
-		else {		
-		fin >> p.radius >> p.mass;
+		else {
+		fin >> p.radius >> density;
 		fin >> p.position >> p.velocity;
         minRadius = p.radius;
+        p.mass = density * pi * p.radius * p.radius;
 		if (p.radius > maxRadius) {
 			maxRadius = p.radius;
 		}
@@ -209,14 +100,4 @@ double appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& syst
 	fout << endl;
 
 	return systemEnergy;
-}
-
-double totalPositionNorm(const vector<Particle>& system) {
-    double result = 0;
-    auto it = system.begin();
-    while (it != system.end()) {
-        result += Vector::norm(it->position);
-        it++;
-    }
-    return result;
 }
