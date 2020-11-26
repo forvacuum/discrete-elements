@@ -17,7 +17,7 @@ public:
 
 	Vector operator+(const Vector&);
 	Vector operator+=(const Vector&);
-	Vector operator-();
+	Vector operator-() const;
 	Vector operator-(const Vector&) const;
 	Vector operator*(double);
 	friend Vector operator* (double, const Vector&);
@@ -26,6 +26,7 @@ public:
 	bool operator!=(const Vector&) const;
 
 	static double dotProduct(const Vector&, const Vector&);
+	//TODO: make this method non-static
 	static double norm(const Vector&);
 
 	friend std::ostream& operator<<(std::ostream&, const Vector&);

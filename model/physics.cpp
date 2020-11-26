@@ -1,20 +1,22 @@
 #include "physics.h"
 #include "impexp.h"
+
 double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
-          std::vector<GridCell>& grid, double timeStep, const double border[4]) {
+          Grid& grid, double timeStep, const double border[4]) {
     double packTime = 0;
     //double positionDiff;
     double energyDiff;
     //double systemPositionNorm = 0;
     double systemEnergy = 0;
     double eps = 1e-7;
-
+    //TODO: switch the stopping criterion onto energy relation
     do {
-        fout << packTime << " ";
+        //fout << packTime << " ";
         //positionDiff = systemPositionNorm;
         energyDiff = systemEnergy;
-        appendSystemPosition(fout, system);
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        //appendSystemPosition(fout, system);
+        //systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        systemEnergy = calculateTotalSystemEnergy(system, border, grid);
         calculateNextIteration(system, grid, timeStep, border);
         //systemPositionNorm = totalPositionNorm(system);
         //positionDiff -= systemPositionNorm;
@@ -26,7 +28,7 @@ double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& s
     return packTime;
 }
 
-void setNeighbours(std::vector<Particle>& system, std::vector<GridCell>& grid) {
+void setNeighbours(std::vector<Particle>& system, Grid& grid) {
     size_t cellIndex;
     double delta;
     Vector relativePosition;
@@ -38,10 +40,10 @@ void setNeighbours(std::vector<Particle>& system, std::vector<GridCell>& grid) {
 
     while (it != system.end()) {
         for (int i = it->gridRow - 1; i <= it->gridRow + 1; i++) {
-            if (i >= 0 && i < GridCell::horizontalAmount) { // checking for row index correctness
+            if (i >= 0 && i < grid.horizontalAmount) { // checking for row index correctness
                 for (int j = it->gridColumn - 1; j <= it->gridColumn + 1; j++) {
-                    if (j >= 0 && j < GridCell::horizontalAmount) { // checking for column index correctness
-                        cellIndex = i * GridCell::verticalAmount + j;
+                    if (j >= 0 && j < grid.horizontalAmount) { // checking for column index correctness
+                        cellIndex = i * grid.verticalAmount + j;
 
                         itGrid = grid.at(cellIndex).contents.begin();
                         lastParticle = grid.at(cellIndex).contents.end();
@@ -67,35 +69,31 @@ void setNeighbours(std::vector<Particle>& system, std::vector<GridCell>& grid) {
 }
 
 double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
-            std::vector<GridCell>& grid, double timeStep, double packTime, const double border[4]) {
+            Grid& grid, double timeStep, double packTime, const double border[4]) {
     double workTime = 0;
     double totalTime = packTime;
-    //double positionDiff;
     double energyDiff;
-    //double systemPositionNorm = 0;
     double systemEnergy = 0;
-    double eps = 1e-6;
+    double eps = 1e-7;
 
     do {
-        fout << totalTime << " ";
-        appendSystemPosition(fout, system);
-        //positionDiff = systemPositionNorm;
-        energyDiff = systemEnergy;
-        systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        //fout << totalTime << " ";
+        //appendSystemPosition(fout, system);
+        //energyDiff = systemEnergy;
+        //systemEnergy = appendSystemEnergy(fout_e, system, grid, border);
+        //systemEnergy = calculateTotalSystemEnergy(system, border, grid);
         calculateNextIteration(system, grid, timeStep, border);
-        //systemPositionNorm = totalPositionNorm(system);
-        //positionDiff -= systemPositionNorm;
-        energyDiff -= systemEnergy;
+        //energyDiff -= systemEnergy;
         workTime += timeStep;
         totalTime += timeStep;
 
-    } while (abs(energyDiff) >= eps || workTime < 1);
+    } while (abs(calculateEnergyRelation(system, border)) >= eps || workTime < 1);
 
     return workTime;
 }
 
 // Note: force function is considered not to depend on time explicitly
-void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& grid,
+void calculatePosition(std::vector<Particle>& system, Grid& grid,
                        double timeStep, const double border[4]) {
 	Vector force;
 	auto it = system.begin();
@@ -113,7 +111,7 @@ void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& gri
 		it->velocity.setX(it->velocity.getX() + timeStep * force.getX() / 2 / it->mass);
 		it->velocity.setY(it->velocity.getY() + timeStep * force.getY() / 2 / it->mass);
 
-		it->refreshGridCoordinates(grid);
+		it->refreshGridCoordinates(grid, border);
 
 		it++;
 	}
@@ -122,8 +120,7 @@ void calculatePosition(std::vector<Particle>& system, std::vector<GridCell>& gri
 
 }
 
-
-void calculateVelocity(std::vector<Particle>& system, std::vector<GridCell>& grid,
+void calculateVelocity(std::vector<Particle>& system, Grid& grid,
                        double timeStep, const double border[4]) {
 	Vector force;
 	auto it = system.begin();
@@ -139,25 +136,41 @@ void calculateVelocity(std::vector<Particle>& system, std::vector<GridCell>& gri
 	}
 }
 
-void calculateNextIteration(std::vector<Particle>& system, std::vector<GridCell>& grid, double timeStep, const double border[4]) {
+void calculateNextIteration(std::vector<Particle>& system, Grid& grid, double timeStep, const double border[4]) {
 	calculatePosition(system, grid, timeStep, border);
 	calculateVelocity(system, grid, timeStep, border);
 }
 
 
-Vector applyForce(Particle& particle, std::vector<GridCell>& grid, const double border[4], double timeStep) {
+Vector applyForce(Particle& particle, Grid& grid, const double border[4], double timeStep) {
 	Vector resultant = Vector();
 
 	resultant += applyWeight(particle);
 	resultant += applyNormalForce(particle, grid);
 	resultant += applyShearForce(particle, grid, timeStep);
 	resultant += applyWallRepulsion(particle, border);
+	resultant += applyWallFriction(particle, border);
 	resultant += applyDissipation(particle);
 
 	return resultant;
 }
 
-double calculateTotalEnergy(const Particle& particle, const double border[4], std::vector<GridCell>& grid) {
+double calculateEnergyRelation(const std::vector<Particle>& system, const double border[4]) {
+    auto it = system.begin();
+    double result = 0;
+    double kinetic = 0;
+    double potential = 0;
+
+    while (it != system.end()) {
+        kinetic += kineticEnergy(*it);
+        potential += potentialEnergy(*it, border);
+        it++;
+    }
+
+    return kinetic / potential;
+}
+
+double calculateTotalEnergy(const Particle& particle, const double border[4], Grid& grid) {
 	double totalEnergy = 0;
 
 	/* Kinetic */
@@ -177,15 +190,29 @@ double calculateTotalEnergy(const Particle& particle, const double border[4], st
 	return totalEnergy;
 }
 
+double calculateTotalSystemEnergy(const std::vector<Particle>& system, const double border[4], Grid& grid) {
+    auto it = system.begin();
+    double systemEnergy = 0;
+    double tmp;
+
+    while (it != system.end()) {
+        tmp = calculateTotalEnergy(*it, border, grid);
+        systemEnergy += tmp;
+        it++;
+    }
+
+    return systemEnergy;
+}
+
 double kineticEnergy(const Particle& particle) {
 	return particle.mass * Vector::dotProduct(particle.velocity, particle.velocity) / 2;
 }
 
 double potentialEnergy(const Particle& particle, const double border[4]) {
-	return particle.mass * g * (particle.position.getY() - border[2]);  //reference level is consdered to be exactly the bottom border line
+	return particle.mass * g * (particle.position.getY() - border[2]);  //reference level is considered to be exactly the bottom border line
 }
 
-double normalForceEnergy(const Particle& particle, std::vector<GridCell>& grid) {
+double normalForceEnergy(const Particle& particle, Grid& grid) {
 	double result = 0;
 	double delta = 0;
 	size_t cellIndex;
@@ -193,10 +220,10 @@ double normalForceEnergy(const Particle& particle, std::vector<GridCell>& grid) 
 	std::vector<Particle*>::iterator lastParticle;
 
 	for (int i = particle.gridRow - 1; i <= particle.gridRow + 1; i++) {
-		if (i >= 0 && i < GridCell::horizontalAmount) {
+		if (i >= 0 && i < grid.horizontalAmount) {
 			for (int j = particle.gridColumn - 1; j <= particle.gridColumn + 1; j++) {
-				if (j >= 0 && j < GridCell::horizontalAmount) {
-					cellIndex = i * GridCell::verticalAmount + j;
+				if (j >= 0 && j < grid.horizontalAmount) {
+					cellIndex = i * grid.verticalAmount + j;
 
 					it = grid.at(cellIndex).contents.begin();
 					lastParticle = grid.at(cellIndex).contents.end();

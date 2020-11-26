@@ -3,28 +3,37 @@
 #include <algorithm>
 #include "particle.h"
 
+struct Grid;
 struct Particle;
 
+//TODO: implement the cell access by its coordinates
+//      fix the coordinates calculation or remove these fields
 struct GridCell {
 	double x;
 	double y;
 	std::vector<Particle*> contents;
 
 	static double defaultSize;
-	static double length;
 	static double width;
+	static double height;
 
-	static size_t horizontalAmount;
-	static size_t verticalAmount;
-
-
-	GridCell();
+    GridCell();
 	GridCell(double, double);
 	void addParticle(Particle*);
 	void removeParticle(Particle*);
-	static std::vector<GridCell> setGrid(double[4]);
-	static void setCellsContents(std::vector<GridCell>&, std::vector<Particle>&);
+	static void setCellsContents(Grid&, std::vector<Particle>&);
+	static double getPreferredSize(double);
+};
+
+struct Grid {
+    std::vector<GridCell> grid;
+    size_t horizontalAmount;
+    size_t verticalAmount;
+    double* workspaceBorder;
+
+    Grid(double*);
+    GridCell& at(size_t);
 
 private:
-	static double getPreferredSize(double);
+    std::vector<GridCell> setGrid(const double[4]);
 };

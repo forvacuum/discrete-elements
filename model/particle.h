@@ -1,6 +1,7 @@
 #pragma once
-#include "vector2D.h"
 #include "grid.h"
+#include "parameter.h"
+#include "vector2D.h"
 #include <vector>
 #include <unordered_map>
 
@@ -27,7 +28,9 @@ struct Particle {
 	static double stiffnessRepulsive;
 	static double stiffnessAttractive;
 	static double stiffnessShear;
-	static double frictionCoefficient;
+	static double particleFriction;
+	static double wallFriction;
+	static double floorFriction;
 	static double minRadius;
 	static double maxRadius;
 	static double criticalDistance;
@@ -37,8 +40,7 @@ struct Particle {
 	Particle();
 	bool operator==(const Particle&) const;
 	bool operator!=(const Particle&) const;
-	void refreshGridCoordinates(std::vector<GridCell>&);
-	static void setGridCellPositions(std::vector<Particle>&, const std::vector<GridCell>&);
-	static void refreshDeltaWall(std::vector<GridCell>&, const double[4]);
-	//static std::string getConstants();
+	void refreshGridCoordinates(Grid&, const double[4]);
+	static void setGridCellPositions(std::vector<Particle>&, const Grid&);
+	static void refreshDeltaWall(Grid&, const double[4]);
 };

@@ -1,18 +1,7 @@
 #include "impexp.h"
+#include "parameter.h"
 
 using namespace std;
-
-void initialize(double* border, double& timeStep, bool& generatorEnabled, bool& prePacked, bool& packOnly) {
-    string infoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\info.txt)";
-
-    ifstream fin(infoFile);
-    for (int i = 0; i < 4; i++) {
-        fin >> border[i];
-    }
-
-    fin >> timeStep >> generatorEnabled >> prePacked >> packOnly;
-    fin.close();
-}
 
 /* This function creates a file named as specified in the argument 'particlesFilename'
 	containing initial data for given amount of randomly generated particles
@@ -126,14 +115,13 @@ void generateParticlesTriangle(const string& infoFilename, const string& particl
 	fout.close();
 }
 
-vector<Particle> importParticles(const string& sourceFile, const string& constantsFile, double border[4]) {
+vector<Particle> importParticles(const string &sourceFile, const string &constantsFile) {
 	ifstream fin(sourceFile);
     ifstream fin_const(constantsFile);
 	Particle p;
 	vector<Particle> system;
 	Vector relativePosition;
 	int peekValue;
-	size_t size;
 	double minRadius;
 	double maxRadius = 0;
 
@@ -157,12 +145,12 @@ vector<Particle> importParticles(const string& sourceFile, const string& constan
 	}
 	fin.close();
 
-	size = system.size();
-
 	fin_const >> Particle::stiffnessRepulsive;
 	fin_const >> Particle::stiffnessAttractive;
 	fin_const >> Particle::stiffnessShear;
-	fin_const >> Particle::frictionCoefficient;
+	fin_const >> Particle::particleFriction;
+	fin_const >> Particle::wallFriction;
+	fin_const >> Particle::floorFriction;
 	fin_const >> Particle::criticalDistance;
 
 	Particle::minRadius = minRadius;
@@ -174,7 +162,6 @@ vector<Particle> importParticles(const string& sourceFile, const string& constan
 void exportParticles(const std::string& filename, const vector<Particle>& system) {
     ofstream fout(filename);
     auto it = system.begin();
-    bool wtf = fout.is_open();
     while (it != system.end()) {
         fout << it->radius << " " << it->mass << " ";
         fout << it->position << it->velocity << endl;
@@ -208,7 +195,7 @@ void appendSystemPosition(std::ofstream& fout, const std::vector<Particle>& syst
 	fout << endl;
 }
 
-double appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, std::vector<GridCell>& grid, const double border[4]) {
+double appendSystemEnergy(std::ofstream& fout, const std::vector<Particle>& system, Grid& grid, const double border[4]) {
 	auto it = system.begin();
 	double systemEnergy = 0;
 	double tmp;
