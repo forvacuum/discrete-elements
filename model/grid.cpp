@@ -1,3 +1,4 @@
+#include "particle.h"
 #include "grid.h"
 
 double GridCell::defaultSize = 0;
@@ -34,16 +35,6 @@ double GridCell::getPreferredSize(double workspaceMeasure) {
 	return defaultSize + additionalSize;
 }
 
-void GridCell::setCellsContents(Grid& grid, std::vector<Particle>& system) {
-	auto it = system.begin();
-	size_t cellIndex;
-	while (it != system.end()) {
-		cellIndex = it->gridRow * grid.verticalAmount + it->gridColumn;
-		grid.at(cellIndex).contents.push_back(&(*it));
-		it++;
-	}
-}
-
 Grid::Grid(double* workspace) {
     workspaceBorder = workspace;
     grid = setGrid(workspaceBorder);
@@ -51,6 +42,16 @@ Grid::Grid(double* workspace) {
 
 GridCell &Grid::at(size_t index) {
     return grid.at(index);
+}
+
+void Grid::setCellsContents(std::vector<Particle>& system) {
+    auto it = system.begin();
+    size_t cellIndex;
+    while (it != system.end()) {
+        cellIndex = it->gridRow * this->verticalAmount + it->gridColumn;
+        this->at(cellIndex).contents.push_back(&(*it));
+        it++;
+    }
 }
 
 std::vector<GridCell> Grid::setGrid(const double workspace[4]) {
