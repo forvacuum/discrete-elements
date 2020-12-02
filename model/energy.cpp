@@ -1,6 +1,6 @@
 #include "energy.h"
 #include "impexp.h"
-#include "comp.h"
+#include "calc.h"
 #include "force.h"
 
 

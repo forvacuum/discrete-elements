@@ -4,7 +4,7 @@
 
 #include "particle.h"
 #include "impexp.h"
-#include "comp.h"
+#include "calc.h"
 #include "grid.h"
 
 using namespace std;
@@ -69,9 +69,8 @@ int main(int argc, char* argv[]) {
     fout << time << " ";
     appendSystemPosition(fout, system);
 	if(!packOnly) {
-        Particle::isWallEnabled[1] = false;
         setNeighbours(system, grid);
-        execute(fout, fout_e, system, grid, timeStep, time, border);
+        shiftWall(fout, fout_e, system, grid, timeStep, time, border);
         fout << time << " ";
         appendSystemPosition(fout, system);
 	}

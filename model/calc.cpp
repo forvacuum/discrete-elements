@@ -1,4 +1,4 @@
-#include "comp.h"
+#include "calc.h"
 #include "impexp.h"
 #include "force.h"
 
@@ -120,11 +120,12 @@ void setNeighbours(std::vector<Particle>& system, Grid& grid) {
     }
 }
 
-double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
-               Grid& grid, double timeStep, double packTime, const double border[4]) {
+double removeWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
+                  Grid& grid, double timeStep, double packTime, const double *border) {
     double workTime = 0;
     double totalTime = packTime;
     double eps = 1e-6;
+    Particle::isWallEnabled[1] = false;
 
     do {
         //fout << totalTime << " ";
@@ -135,6 +136,30 @@ double execute(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>
         totalTime += timeStep;
 
     } while (abs(calculateEnergyRelation(system, border)) >= eps || workTime < 0.1);
+
+    return workTime;
+}
+
+double shiftWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
+                  Grid& grid, double timeStep, double packTime, double *border) {
+    double workTime = 0;
+    double totalTime = packTime;
+    double eps = 1e-6;
+    //border[3] = highestOrdinate(system) + Particle::maxRadius;
+
+    do {
+        fout << totalTime << " ";
+        appendSystemPosition(fout, system);
+        appendSystemEnergy(fout_e, system, grid, border);
+        if (border[2] >= highestOrdinate(system) / 10) {
+            break;
+        }
+        border[2] += 1e-5;
+        calculateNextIteration(system, grid, timeStep, border);
+        workTime += timeStep;
+        totalTime += timeStep;
+
+    } while (true);
 
     return workTime;
 }
@@ -201,4 +226,18 @@ double calculateEnergyRelation(const std::vector<Particle>& system, const double
     }
 
     return kinetic / potential;
+}
+
+double highestOrdinate(const std::vector<Particle>& system) {
+    auto it = system.begin();
+    double maxY = system.begin()->position.getY();
+
+    while (it != system.end()) {
+        if(it->position.getY() > maxY) {
+            maxY = it->position.getY();
+        }
+        it++;
+    }
+
+    return maxY;
 }

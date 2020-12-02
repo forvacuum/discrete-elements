@@ -1,4 +1,4 @@
-#include "comp.h"
+#include "calc.h"
 #include "impexp.h"
 #include "energy.h"
 #include "force.h"

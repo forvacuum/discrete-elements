@@ -50,6 +50,16 @@ void Particle::refreshGridCoordinates(Grid& grid, const double border[4]) {
 	size_t oldCellIndex = gridRow * grid.verticalAmount + gridColumn;
 	size_t newCellIndex;
 
+//	if(position.getX() <= border[0] || position.getX() >= border[1] ||
+//            position.getY() <= border[2] || position.getY() >= border[3]) {
+//	    return;
+//	}
+	for (double d : deltaWall) {
+        if(d > 0) {
+            return;
+        }
+	}
+
 	if (position.getX() >= oldCellX + GridCell::width
 			&& gridRow < grid.horizontalAmount - 1) {
 		gridRow++;

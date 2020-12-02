@@ -1,6 +1,6 @@
 #include "impexp.h"
 #include "parameter.h"
-#include "comp.h"
+#include "calc.h"
 
 using namespace std;
 
