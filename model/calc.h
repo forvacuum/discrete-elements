@@ -15,8 +15,11 @@ double pack(std::ofstream&, std::ofstream&, std::vector<Particle>&, Grid& , doub
 
 void setNeighbours(std::vector<Particle>&, Grid&);
 
-double execute(std::ofstream&, std::ofstream&, std::vector<Particle>&, Grid&,
-               double, double, const double[4]);
+double removeWall(std::ofstream &fout, std::ofstream &fout_e, std::vector<Particle> &system, Grid &grid,
+                  double timeStep, double packTime, const double border[4]);
+
+double shiftWall(std::ofstream &fout, std::ofstream &fout_e, std::vector<Particle> &system, Grid &grid,
+                  double timeStep, double packTime, double border[4]);
 
 void calculatePosition(std::vector<Particle>&, Grid&, double, const double[4]);
 
@@ -25,3 +28,5 @@ void calculateVelocity(std::vector<Particle>&, Grid&, double, const double[4]);
 void calculateNextIteration(std::vector<Particle>&, Grid&, double, const double[4]);
 
 double calculateEnergyRelation(const std::vector<Particle>&, const double[4]);
+
+double highestOrdinate(const std::vector<Particle>&);
