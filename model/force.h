@@ -10,7 +10,7 @@
 #include "grid.h"
 
 constexpr auto g = 9.80665;
-constexpr auto dampingCoefficient = 10;
+constexpr auto dampingCoefficient = 1;
 
 struct Particle;
 struct Grid;
