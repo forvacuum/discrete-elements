@@ -77,6 +77,29 @@ void exportDetails(const std::string& filename, const double border[4], const ve
 	fout.close();
 }
 
+void exportEdge(const std::string& outputFilename, Grid& grid, std::unordered_set<size_t> edge) {
+    ofstream fout(outputFilename);
+
+    for (size_t index : edge) {
+        auto it = grid.at(index).contents.begin();
+        while (it != grid.at(index).contents.end()) {
+            fout << (*it)->position << endl;
+            it++;
+        }
+    }
+
+    fout.close();
+}
+
+void exportGrid(const std::string& outputFilename, Grid& grid) {
+    ofstream fout(outputFilename);
+    for (int i = 0; i < 4; i++) {
+        fout << grid.workspaceBorder[i] << " ";
+    }
+    fout << GridCell::width << " " << GridCell::height << endl;
+    fout.close();
+}
+
 void appendSystemPosition(std::ofstream& fout, const std::vector<Particle>& system) {
 	auto it = system.begin();
 	while (it != system.end()) {

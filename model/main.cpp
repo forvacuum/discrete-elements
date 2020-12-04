@@ -45,12 +45,18 @@ int main(int argc, char* argv[]) {
 
 	log << "Particles are imported" << endl;
 
+//    auto system = importParticles(R"(C:\Users\Veronika\discrete-elements\auxiliary\converted.txt)", constantsFile);
+
     GridCell::defaultSize = Particle::maxRadius * 2;
 	Grid grid(workspace);
 	Particle::setGridCellPositions(system, grid);
 	grid.setCellsContents(system);
 	Particle::refreshDeltaWall(grid, border);
 	log << "Grid is set" << endl;
+
+//    auto edge = getEdge(system, grid);
+//    exportEdge(R"(C:\Users\Veronika\Documents\visualisation\edge.txt)", grid, edge);
+//    exportGrid(R"(C:\Users\Veronika\Documents\visualisation\grid.txt)", grid);
 
 	vector<Particle>::iterator it;
     double time = 0;
@@ -60,7 +66,7 @@ int main(int argc, char* argv[]) {
 	ofstream fout(outputFile);
 	ofstream fout_e(outputEnergyFile);
 
-	if(!Particle::isPacked) {
+    if(!Particle::isPacked) {
         time = pack(fout, fout_e, system, grid, timeStep, border);
         log << "Packing is ready" << endl;
         Particle::isPacked = true;
@@ -70,13 +76,14 @@ int main(int argc, char* argv[]) {
     appendSystemPosition(fout, system);
 	if(!packOnly) {
         setNeighbours(system, grid);
-        shiftWall(fout, fout_e, system, grid, timeStep, time, border);
+        //shiftWall(fout, fout_e, system, grid, timeStep, time, border);
+        removeWall(fout, fout_e, system, grid, timeStep, time, border);
         fout << time << " ";
         appendSystemPosition(fout, system);
 	}
 	fout.close();
     fout_e.close();
 
-	log << argv[0] << "ended successfully" << endl;
+	log << argv[0] << " ended successfully" << endl;
 	return 0;
 }

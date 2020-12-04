@@ -5,6 +5,9 @@
 #include <ctime>
 #include <vector>
 #include <iterator>
+#include <unordered_set>
+#include <queue>
+
 #include "vector2D.h"
 #include "particle.h"
 #include "energy.h"
@@ -30,3 +33,7 @@ void calculateNextIteration(std::vector<Particle>&, Grid&, double, const double[
 double calculateEnergyRelation(const std::vector<Particle>&, const double[4]);
 
 double highestOrdinate(const std::vector<Particle>&);
+
+Particle* farRight(std::vector<Particle>&);
+
+std::unordered_set<size_t> getEdge(std::vector<Particle>&, Grid&);

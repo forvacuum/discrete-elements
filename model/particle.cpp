@@ -50,15 +50,15 @@ void Particle::refreshGridCoordinates(Grid& grid, const double border[4]) {
 	size_t oldCellIndex = gridRow * grid.verticalAmount + gridColumn;
 	size_t newCellIndex;
 
-//	if(position.getX() <= border[0] || position.getX() >= border[1] ||
-//            position.getY() <= border[2] || position.getY() >= border[3]) {
-//	    return;
-//	}
-	for (double d : deltaWall) {
-        if(d > 0) {
-            return;
-        }
+	if(position.getX() <= border[0] || position.getX() >= border[1] ||
+            position.getY() <= border[2] || position.getY() >= border[3]) {
+	    return;
 	}
+//	for (double d : deltaWall) {
+//        if(d > 0) {
+//            return;
+//        }
+//	}
 
 	if (position.getX() >= oldCellX + GridCell::width
 			&& gridRow < grid.horizontalAmount - 1) {
@@ -94,10 +94,10 @@ void Particle::refreshGridCoordinates(Grid& grid, const double border[4]) {
 
 void Particle::setGridCellPositions(std::vector<Particle> &system, Grid& grid) {
     auto it = system.begin();
-    int i = 0;
-    int j = 0;
 
     while (it != system.end()) {
+        int i = 0;
+        int j = 0;
         while (grid.workspaceBorder[0] + i * GridCell::width < it->position.getX()) {
             i++;
         }
