@@ -22,9 +22,9 @@ int main(int argc, char* argv[]) {
 	bool generatorEnabled;
 	bool prePacked;
     bool packOnly;
+    Particle* wentOut = nullptr;
 
 	ofstream log(stdout);
-
 	log << "Start of " << argv[0] << endl;
 	initialize(border, timeStep, generatorEnabled, prePacked, packOnly);
     workspace = setWorkspace(border);
@@ -67,22 +67,34 @@ int main(int argc, char* argv[]) {
 	ofstream fout_e(outputEnergyFile);
 
     if(!Particle::isPacked) {
-        time = pack(fout, fout_e, system, grid, timeStep, border);
-        log << "Packing is ready" << endl;
-        Particle::isPacked = true;
-        exportParticles(R"(C:\Users\Veronika\discrete-elements\auxiliary\packed.txt)", system);
+        try {
+            time = pack(fout, fout_e, system, grid, timeStep, border);
+            log << "Packing is ready" << endl;
+            Particle::isPacked = true;
+            exportParticles(R"(C:\Users\Veronika\discrete-elements\auxiliary\packed.txt)", system);
+        } catch (ParticleOutOfBorderException& e) {
+            wentOut = e.what();
+        }
     }
     fout << time << " ";
     appendSystemPosition(fout, system);
-	if(!packOnly) {
+	if(!packOnly && wentOut == nullptr) {
         setNeighbours(system, grid);
-        //shiftWall(fout, fout_e, system, grid, timeStep, time, border);
-        removeWall(fout, fout_e, system, grid, timeStep, time, border);
-        fout << time << " ";
-        appendSystemPosition(fout, system);
+        try {
+            //shiftWall(fout, fout_e, system, grid, timeStep, time, border);
+            removeWall(fout, fout_e, system, grid, timeStep, time, border);
+            fout << time << " ";
+            appendSystemPosition(fout, system);
+        } catch (ParticleOutOfBorderException& e) {
+            wentOut = e.what();
+        }
 	}
 	fout.close();
     fout_e.close();
+
+    if(wentOut != nullptr) {
+        log << "One of the particles has crossed the border. Program execution is stopped";
+    }
 
 	log << argv[0] << " ended successfully" << endl;
 	return 0;

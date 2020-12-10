@@ -69,12 +69,12 @@ double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& s
     double systemEnergy = 0;
     double eps = 1e-4;
     do {
-//        fout << packTime << " ";
-//        appendSystemPosition(fout, system);
-//        appendSystemEnergy(fout_e, system, grid, border);
+        fout << packTime << " ";
+        appendSystemPosition(fout, system);
+        appendSystemEnergy(fout_e, system, grid, border);
         calculateNextIteration(system, grid, timeStep, border);
         packTime += timeStep;
-
+        checkBorderCrossed(system, grid);
     } while (abs(calculateEnergyRelation(system, border)) >= eps || packTime < 0.1);
 
     return packTime;
@@ -124,7 +124,7 @@ double removeWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Partic
                   Grid& grid, double timeStep, double packTime, const double *border) {
     double workTime = 0;
     double totalTime = packTime;
-    double eps = 1e-5;
+    double eps = 1e-7;
     Particle::isWallEnabled[1] = false;
 
     do {
@@ -134,7 +134,7 @@ double removeWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Partic
         calculateNextIteration(system, grid, timeStep, border);
         workTime += timeStep;
         totalTime += timeStep;
-
+        checkBorderCrossed(system, grid);
     } while (abs(calculateEnergyRelation(system, border)) >= eps || workTime < 0.1);
 
     return workTime;
@@ -158,7 +158,7 @@ double shiftWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particl
         calculateNextIteration(system, grid, timeStep, border);
         workTime += timeStep;
         totalTime += timeStep;
-
+        checkBorderCrossed(system, grid);
     } while (true);
 
     return workTime;
@@ -226,6 +226,19 @@ double calculateEnergyRelation(const std::vector<Particle>& system, const double
     }
 
     return kinetic / potential;
+}
+
+void checkBorderCrossed(std::vector<Particle>& system, const Grid& grid) {
+    for(auto it = system.begin(); it < system.end(); it++) {
+        for (size_t i = 0; i < 4; i++) {
+            if(it->position.getX() < grid.workspaceBorder[0]
+            || it->position.getX() > grid.workspaceBorder[1]
+            || it->position.getY() < grid.workspaceBorder[2]
+            || it->position.getY() > grid.workspaceBorder[3]) {
+                throw ParticleOutOfBorderException(&(*it));
+            }
+        }
+    }
 }
 
 double highestOrdinate(const std::vector<Particle>& system) {

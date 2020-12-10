@@ -22,7 +22,7 @@ double* setWorkspace(const double border[4]) {
 
     // 0.122173 radians correspond to 7°
     //double extraWidth = borderHeight / tan(0.122173);
-    double extraWidth = 2 * borderWidth;
+    double extraWidth = borderWidth;
     auto* workspace = new double[4];
 
     workspace[0] = border[0] - extraWidth;
