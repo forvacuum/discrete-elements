@@ -65,11 +65,11 @@ std::vector<GridCell> Grid::setGrid(const double workspace[4]) {
     size_t i = 0;
     size_t j = 0;
 
-    while (i * GridCell::width < totalWidth) { // might be an error because of floating point???
+    while (workspace[0] + i * GridCell::width < workspace[1]) {
         j = 0;
-        cell.x = i * GridCell::width;
-        while (j * GridCell::height < totalHeight) {
-            cell.y = j * GridCell::height;
+        cell.x = workspace[0] + i * GridCell::width;
+        while (workspace[2] + j * GridCell::height < workspace[3]) {
+            cell.y = workspace[2] + j * GridCell::height;
             result.push_back(cell);
             j++;
         }

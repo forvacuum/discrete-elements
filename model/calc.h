@@ -5,9 +5,14 @@
 #include <ctime>
 #include <vector>
 #include <iterator>
+#include <unordered_set>
+#include <queue>
+
+#include "exception.h"
 #include "vector2D.h"
 #include "particle.h"
 #include "energy.h"
+
 
 void generateParticlesTriangle(const std::string&, const std::string&, const double[4]);
 
@@ -29,4 +34,10 @@ void calculateNextIteration(std::vector<Particle>&, Grid&, double, const double[
 
 double calculateEnergyRelation(const std::vector<Particle>&, const double[4]);
 
+void checkBorderCrossed(std::vector<Particle>& system, const Grid& grid);
+
 double highestOrdinate(const std::vector<Particle>&);
+
+Particle* farRight(std::vector<Particle>&);
+
+std::unordered_set<size_t> getEdge(std::vector<Particle>&, Grid&);

@@ -4,6 +4,7 @@
 #include <ctime>
 #include <vector>
 #include <iterator>
+#include <unordered_set>
 
 #include "vector2D.h"
 #include "particle.h"
@@ -14,5 +15,7 @@ constexpr auto pi = 3.1415926535;
 std::vector <Particle> importParticles(const std::string &sourceFile, const std::string &constantsFile);
 void exportParticles(const std::string&, const std::vector<Particle>&);
 void exportDetails(const std::string&, const double[4], const std::vector<Particle>&);
+void exportEdge(const std::string& outputFilename, Grid& grid, std::unordered_set<size_t> edge);
+void exportGrid(const std::string& outputFilename, Grid& grid);
 void appendSystemPosition(std::ofstream&, const std::vector<Particle>&);
 double appendSystemEnergy(std::ofstream&, const std::vector<Particle>&, Grid&, const double[4]);
