@@ -69,9 +69,10 @@ double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& s
     double systemEnergy = 0;
     double eps = 1e-4;
     do {
-        fout << packTime << " ";
-        appendSystemPosition(fout, system);
-        appendSystemEnergy(fout_e, system, grid, border);
+//        fout << packTime << " ";
+//        appendSystemPosition(fout, system);
+//        appendSystemEnergy(fout_e, system, grid, border);
+
         calculateNextIteration(system, grid, timeStep, border);
         packTime += timeStep;
         checkBorderCrossed(system, grid);
@@ -128,9 +129,10 @@ double removeWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Partic
     Particle::isWallEnabled[1] = false;
 
     do {
-        fout << totalTime << " ";
-        appendSystemPosition(fout, system);
-        appendSystemEnergy(fout_e, system, grid, border);
+//        fout << totalTime << " ";
+//        appendSystemPosition(fout, system);
+//        appendSystemEnergy(fout_e, system, grid, border);
+
         calculateNextIteration(system, grid, timeStep, border);
         workTime += timeStep;
         totalTime += timeStep;
@@ -151,6 +153,7 @@ double shiftWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particl
 //        fout << totalTime << " ";
 //        appendSystemPosition(fout, system);
 //        appendSystemEnergy(fout_e, system, grid, border);
+
         if (border[2] >= highestOrdinate(system) / 10) {
             break;
         }

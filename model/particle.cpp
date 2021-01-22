@@ -44,21 +44,11 @@ bool Particle::operator!=(const Particle& p) const {
 }
 
 void Particle::refreshGridCoordinates(Grid& grid, const double border[4]) {
-	double oldCellX = grid.workspaceBorder[0] + gridRow * GridCell::width;
-	double oldCellY = grid.workspaceBorder[2] + gridColumn * GridCell::height;
+	double oldCellX = grid.workspaceBorder[0] + gridRow * GridCell::width; // abscissa of the current cell
+	double oldCellY = grid.workspaceBorder[2] + gridColumn * GridCell::height; // same for the ordinate
 
 	size_t oldCellIndex = gridRow * grid.verticalAmount + gridColumn;
 	size_t newCellIndex;
-
-	if(position.getX() <= border[0] || position.getX() >= border[1] ||
-            position.getY() <= border[2] || position.getY() >= border[3]) {
-	    return;
-	}
-//	for (double d : deltaWall) {
-//        if(d > 0) {
-//            return;
-//        }
-//	}
 
 	if (position.getX() >= oldCellX + GridCell::width
 			&& gridRow < grid.horizontalAmount - 1) {

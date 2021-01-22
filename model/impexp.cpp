@@ -20,10 +20,10 @@ vector<Particle> importParticles(const string &sourceFile, const string &constan
 			fin.get();
 		}
 		else {
-		fin >> p.radius >> density;
+		fin >> p.radius >> p.mass;
 		fin >> p.position >> p.velocity;
         minRadius = p.radius;
-        p.mass = density * pi * p.radius * p.radius;
+        //p.mass = density * pi * p.radius * p.radius;
 		if (p.radius > maxRadius) {
 			maxRadius = p.radius;
 		}

@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
     fout_e.close();
 
     if(wentOut != nullptr) {
-        log << "One of the particles has crossed the border. Program execution is stopped";
+        log << "One of the particles has crossed the border. Program execution is stopped" << endl;
     }
 
 	log << argv[0] << " ended successfully" << endl;
