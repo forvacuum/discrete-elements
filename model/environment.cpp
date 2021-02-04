@@ -36,7 +36,7 @@ void Environment::execute() {
     Particle* wentOut = nullptr;
     std::ofstream fout(outputFile);
     std::ofstream fout_e(outputEnergyFile);
-    exportDetails(R"(C:\Users\Veronika\Documents\visualisation\info.txt)", border, system);
+    exportDetails(R"(C:\Users\Veronika\discrete-elements\visualisation\info.txt)", border, system);
     switch (actionType) {
         case PACK:
             Particle::isPacked = false;
@@ -76,9 +76,9 @@ void Environment::execute() {
         case GET_EDGE:
             fout << 0 << " ";
             appendSystemPosition(fout, system);
-            exportEdge(R"(C:\Users\Veronika\Documents\visualisation\edge.txt)",
+            exportEdge(R"(C:\Users\Veronika\discrete-elements\visualisation\edge.txt)",
                        grid, getEdge(system, grid));
-            exportGrid(R"(C:\Users\Veronika\Documents\visualisation\grid.txt)", grid);
+            exportGrid(R"(C:\Users\Veronika\discrete-elements\visualisation\grid.txt)", grid);
         default:
             break;
     }

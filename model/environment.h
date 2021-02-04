@@ -17,8 +17,8 @@ public:
     std::string particlesFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\particles.txt)";
     std::string constantsFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\const.txt)";
     std::string generatorInfoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\generatorinfo.txt)";
-    std::string outputFile = R"(C:\Users\Veronika\Documents\visualisation\output.txt)";
-    std::string outputEnergyFile = R"(C:\Users\Veronika\Documents\visualisation\energy.txt)";
+    std::string outputFile = R"(C:\Users\Veronika\discrete-elements\visualisation\output.txt)";
+    std::string outputEnergyFile = R"(C:\Users\Veronika\discrete-elements\visualisation\energy.txt)";
 
     double* border;
     double* workspace;
