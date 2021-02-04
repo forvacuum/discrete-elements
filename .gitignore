@@ -338,8 +338,12 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
 *.txt
-*.txt
+
+# Matlab
+*.asv
+*.mp4
 
 # CMake
 cmake-build-*/
