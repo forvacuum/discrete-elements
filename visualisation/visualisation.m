@@ -16,8 +16,8 @@ actionType = 4;
 
 %% Computation
 
-% initialize(actionType);
-% !C:\Users\Veronika\discrete-elements\model\cmake-build-debug\discrete-elements.exe
+initialize(actionType);
+!C:\Users\Veronika\discrete-elements\model\cmake-build-debug\discrete-elements.exe
 
 %% Rendering
 
@@ -29,18 +29,13 @@ if(actionType ~= 0)
     % If video is needed
     % frame = renderModel(trajectory, border, radius, time, timeDelay, borderWidth);
     % recordVideo(filename, frame, format, frameRate);
+else
+    disp('Done');
 end
 
 if (actionType == 4) 
-%     [edgeX, edgeY] = importEdge();
+    [edgeX, edgeY] = importEdge();
     
     [angle, newX, newY] = aor(edgeX, edgeY, max(radius));
     highlightEdge(fig, newX, newY);
-%     p = polyfit(edgeX, edgeY, 1);
-%     aor = atand(p(1));
-%     
-%     x_plot = [min(edgeX) - 10, max(edgeX) + 10];
-%     y_plot = polyval(p, x_plot);
-%     
-%     plot(x_plot, y_plot, 'Color', [0.6350, 0.0780, 0.1840], 'LineWidth', 1.5);
 end
