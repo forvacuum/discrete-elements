@@ -1,6 +1,6 @@
 #pragma once
 #include "grid.h"
-#include "parameter.h"
+#include "environment.h"
 #include "vector2D.h"
 #include <vector>
 #include <unordered_map>
@@ -38,9 +38,9 @@ struct Particle {
 	static bool isPacked;
 
 	Particle();
-	bool operator==(const Particle&) const;
-	bool operator!=(const Particle&) const;
-	void refreshGridCoordinates(Grid&, const double[4]);
-    static void setGridCellPositions(std::vector<Particle>&, Grid& grid);
-    static void refreshDeltaWall(Grid&, const double[4]);
+	bool operator==(const Particle& particle) const;
+	bool operator!=(const Particle& particle) const;
+	void refreshGridCoordinates(Grid *grid);
+    static void setGridCellPositions(std::vector<Particle>& system, Grid* grid);
+    static void refreshDeltaWall(Grid* grid, const double border[4]);
 };

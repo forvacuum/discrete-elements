@@ -5,11 +5,11 @@
 #include "force.h"
 #include "grid.h"
 
-double calculateTotalEnergy(const Particle&, const double[4], Grid&);
-double calculateTotalSystemEnergy(const std::vector<Particle>&, const double[4], Grid&);
+double calculateTotalEnergy(const Particle& particle, const double border[4], Grid* grid);
+double calculateTotalSystemEnergy(const std::vector<Particle>& particle, const double border[4], Grid* grid);
 
-double kineticEnergy(const Particle&);
-double potentialEnergy(const Particle&, const double[4]);
-double normalForceEnergy(const Particle&, Grid&);
-//double shearForceEnergy(const Particle&);
-double elasticWallEnergy(const Particle&);
+double kineticEnergy(const Particle& particle);
+double potentialEnergy(const Particle& particle, const double border[4]);
+double normalForceEnergy(const Particle& particle, Grid* grid);
+//double shearForceEnergy(const Particle& particle);
+double elasticWallEnergy(const Particle& particle);

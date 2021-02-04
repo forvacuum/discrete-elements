@@ -15,11 +15,11 @@ constexpr auto dampingCoefficient = 1;
 struct Particle;
 struct Grid;
 
-Vector applyWeight(const Particle&);
-Vector applyNormalForce(Particle&, Grid&);
-Vector applyShearForce(Particle&, Grid&, double);
-Vector applyWallRepulsion(const Particle &p);
-Vector applyWallFriction(const Particle &p);
-Vector applyDissipation(const Particle&);
+Vector applyWeight(const Particle& particle);
+Vector applyNormalForce(Particle& particle, Grid* grid);
+Vector applyShearForce(Particle& particle, Grid* grid, double timeStep);
+Vector applyWallRepulsion(const Particle& particle);
+Vector applyWallFriction(const Particle& particle);
+Vector applyDissipation(const Particle& particle);
 
-Vector applyForce(Particle&, Grid&, const double[4], double);
+Vector applyForce(Particle& particle, Grid* grid, const double border[4], double timeStep);

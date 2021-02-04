@@ -1,5 +1,4 @@
 #include "particle.h"
-#include "grid.h"
 
 double Particle::minRadius = 0;
 double Particle::maxRadius = 0;
@@ -43,57 +42,57 @@ bool Particle::operator!=(const Particle& p) const {
 		|| this->radius != p.radius;
 }
 
-void Particle::refreshGridCoordinates(Grid& grid, const double border[4]) {
-	double oldCellX = grid.workspaceBorder[0] + gridRow * GridCell::width; // abscissa of the current cell
-	double oldCellY = grid.workspaceBorder[2] + gridColumn * GridCell::height; // same for the ordinate
+void Particle::refreshGridCoordinates(Grid *grid) {
+	double oldCellX = grid->workspaceBorder[0] + gridRow * GridCell::width; // abscissa of the current cell
+	double oldCellY = grid->workspaceBorder[2] + gridColumn * GridCell::height; // same for the ordinate
 
-	size_t oldCellIndex = gridRow * grid.verticalAmount + gridColumn;
+	size_t oldCellIndex = gridRow * grid->verticalAmount + gridColumn;
 	size_t newCellIndex;
 
 	if (position.getX() >= oldCellX + GridCell::width
-			&& gridRow < grid.horizontalAmount - 1) {
+			&& gridRow < grid->horizontalAmount - 1) {
 		gridRow++;
-		grid.at(oldCellIndex).removeParticle(this);
-		newCellIndex = gridRow * grid.verticalAmount + gridColumn;
-		grid.at(newCellIndex).addParticle(this);
+		grid->at(oldCellIndex).removeParticle(this);
+		newCellIndex = gridRow * grid->verticalAmount + gridColumn;
+		grid->at(newCellIndex).addParticle(this);
 
 	}
 
 	else if (position.getX() < oldCellX && oldCellX != 0) {
 		gridRow--;
-		grid.at(oldCellIndex).removeParticle(this);
-		newCellIndex = gridRow * grid.verticalAmount + gridColumn;
-		grid.at(newCellIndex).addParticle(this);
+		grid->at(oldCellIndex).removeParticle(this);
+		newCellIndex = gridRow * grid->verticalAmount + gridColumn;
+		grid->at(newCellIndex).addParticle(this);
 	}
 
 	if (position.getY() >= oldCellY + GridCell::height
-			&& gridColumn < grid.verticalAmount - 1) {
+			&& gridColumn < grid->verticalAmount - 1) {
 		gridColumn++;
-		grid.at(oldCellIndex).removeParticle(this);
-		newCellIndex = gridRow * grid.verticalAmount + gridColumn;
-		grid.at(newCellIndex).addParticle(this);
+		grid->at(oldCellIndex).removeParticle(this);
+		newCellIndex = gridRow * grid->verticalAmount + gridColumn;
+		grid->at(newCellIndex).addParticle(this);
 	}
 
 	else if (position.getY() < oldCellY && oldCellY != 0) {
 		gridColumn--;
-		grid.at(oldCellIndex).removeParticle(this);
-		newCellIndex = gridRow * grid.verticalAmount + gridColumn;
-		grid.at(newCellIndex).addParticle(this);
+		grid->at(oldCellIndex).removeParticle(this);
+		newCellIndex = gridRow * grid->verticalAmount + gridColumn;
+		grid->at(newCellIndex).addParticle(this);
 	}
 }
 
-void Particle::setGridCellPositions(std::vector<Particle> &system, Grid& grid) {
+void Particle::setGridCellPositions(std::vector<Particle> &system, Grid* grid) {
     auto it = system.begin();
 
     while (it != system.end()) {
         int i = 0;
         int j = 0;
-        while (grid.workspaceBorder[0] + i * GridCell::width < it->position.getX()) {
+        while (grid->workspaceBorder[0] + i * GridCell::width < it->position.getX()) {
             i++;
         }
         i--;
 
-        while (grid.workspaceBorder[2] + j * GridCell::height < it->position.getY()) {
+        while (grid->workspaceBorder[2] + j * GridCell::height < it->position.getY()) {
             j++;
         }
         j--;
@@ -106,7 +105,7 @@ void Particle::setGridCellPositions(std::vector<Particle> &system, Grid& grid) {
 
 //TODO: move the calculations of border coordinates somewhere else
 //TODO: refactor this
-void Particle::refreshDeltaWall(Grid& grid, const double border[4]) {
+void Particle::refreshDeltaWall(Grid* grid, const double border[4]) {
     // This method goes through all particles in the same cells as the border
     // and in the adjacent ones that are placed inside the container
 	std::vector<Particle*>::iterator it1;
@@ -118,19 +117,19 @@ void Particle::refreshDeltaWall(Grid& grid, const double border[4]) {
 	size_t currentCellNumber;
 
 	/* Left wall */
-    while (grid.workspaceBorder[0] + borderCoordinateInGrid * GridCell::width < border[0] - GridCell::width) {
+    while (grid->workspaceBorder[0] + borderCoordinateInGrid * GridCell::width < border[0] - GridCell::width) {
         borderCoordinateInGrid++;
     }
 	if (isWallEnabled[0]) {
-		for (size_t i = 0; i < grid.verticalAmount; i++) {
-		    currentCellNumber = i + borderCoordinateInGrid * grid.verticalAmount;
+		for (size_t i = 0; i < grid->verticalAmount; i++) {
+		    currentCellNumber = i + borderCoordinateInGrid * grid->verticalAmount;
 
-            it1 = grid.at(currentCellNumber).contents.begin();
-            it1_end = grid.at(currentCellNumber).contents.end();
+            it1 = grid->at(currentCellNumber).contents.begin();
+            it1_end = grid->at(currentCellNumber).contents.end();
 
-            currentCellNumber = i + (borderCoordinateInGrid + 1) * grid.verticalAmount;
-            it2 = grid.at(currentCellNumber).contents.begin();
-            it2_end = grid.at(currentCellNumber).contents.end();
+            currentCellNumber = i + (borderCoordinateInGrid + 1) * grid->verticalAmount;
+            it2 = grid->at(currentCellNumber).contents.begin();
+            it2_end = grid->at(currentCellNumber).contents.end();
 
 			while (it1 != it1_end) {
 				(*it1)->deltaWall[0] = (*it1)->radius - ((*it1)->position.getX() - border[0]);
@@ -150,18 +149,18 @@ void Particle::refreshDeltaWall(Grid& grid, const double border[4]) {
 	}
 
 	/* Right wall */
-    while (grid.workspaceBorder[0] + borderCoordinateInGrid * GridCell::width < border[1] - GridCell::width) {
+    while (grid->workspaceBorder[0] + borderCoordinateInGrid * GridCell::width < border[1] - GridCell::width) {
         borderCoordinateInGrid++;
     }
     if (isWallEnabled[1]) {
-		for (int i = 0; i < grid.verticalAmount; i++) {
-            currentCellNumber = i + borderCoordinateInGrid * grid.verticalAmount;
-			it1 = grid.at(currentCellNumber - 1).contents.begin();
-            it1_end = grid.at(currentCellNumber - 1).contents.end();
+		for (int i = 0; i < grid->verticalAmount; i++) {
+            currentCellNumber = i + borderCoordinateInGrid * grid->verticalAmount;
+			it1 = grid->at(currentCellNumber - 1).contents.begin();
+            it1_end = grid->at(currentCellNumber - 1).contents.end();
 
-            currentCellNumber = i + (borderCoordinateInGrid - 1) * grid.verticalAmount;
-            it2 = grid.at(currentCellNumber).contents.begin();
-            it2_end = grid.at(currentCellNumber).contents.end();
+            currentCellNumber = i + (borderCoordinateInGrid - 1) * grid->verticalAmount;
+            it2 = grid->at(currentCellNumber).contents.begin();
+            it2_end = grid->at(currentCellNumber).contents.end();
 
 			while (it1 != it1_end) {
 				(*it1)->deltaWall[1] = (*it1)->radius + ((*it1)->position.getX() - border[1]);
@@ -183,17 +182,17 @@ void Particle::refreshDeltaWall(Grid& grid, const double border[4]) {
 
 	/* Bottom wall */
     borderCoordinateInGrid = 0;
-    while (grid.workspaceBorder[2] + borderCoordinateInGrid * GridCell::height < border[2] - GridCell::height) {
+    while (grid->workspaceBorder[2] + borderCoordinateInGrid * GridCell::height < border[2] - GridCell::height) {
         borderCoordinateInGrid++;
     }
 	if (isWallEnabled[2]) {
-		for (int i = 0; i < grid.horizontalAmount; i++) {
-		    currentCellNumber = i * grid.verticalAmount + borderCoordinateInGrid;
-            it1 = grid.at(currentCellNumber).contents.begin();
-            it1_end = grid.at(currentCellNumber).contents.end();
+		for (int i = 0; i < grid->horizontalAmount; i++) {
+		    currentCellNumber = i * grid->verticalAmount + borderCoordinateInGrid;
+            it1 = grid->at(currentCellNumber).contents.begin();
+            it1_end = grid->at(currentCellNumber).contents.end();
 
-            it2 = grid.at(currentCellNumber + 1).contents.begin();
-            it2_end = grid.at(currentCellNumber + 1).contents.end();
+            it2 = grid->at(currentCellNumber + 1).contents.begin();
+            it2_end = grid->at(currentCellNumber + 1).contents.end();
 
 			while (it1 != it1_end) {
 				(*it1)->deltaWall[2] = (*it1)->radius - ((*it1)->position.getY() - border[2]);
@@ -214,20 +213,20 @@ void Particle::refreshDeltaWall(Grid& grid, const double border[4]) {
 
 	borderCoordinateInGrid = 0;
 	/* Top wall */
-    while (grid.workspaceBorder[2] + borderCoordinateInGrid * GridCell::height < border[3] - GridCell::height) {
+    while (grid->workspaceBorder[2] + borderCoordinateInGrid * GridCell::height < border[3] - GridCell::height) {
         borderCoordinateInGrid++;
     }
-    if (borderCoordinateInGrid == grid.verticalAmount) { //crutch?
+    if (borderCoordinateInGrid == grid->verticalAmount) { //crutch?
         borderCoordinateInGrid--;
     }
 	if (isWallEnabled[3]) {
-		for (int i = 0; i < grid.horizontalAmount; i++) {
-            currentCellNumber = i * grid.verticalAmount + borderCoordinateInGrid;
-            it1 = grid.at(currentCellNumber).contents.begin();
-			it1_end = grid.at(currentCellNumber).contents.end();
+		for (int i = 0; i < grid->horizontalAmount; i++) {
+            currentCellNumber = i * grid->verticalAmount + borderCoordinateInGrid;
+            it1 = grid->at(currentCellNumber).contents.begin();
+			it1_end = grid->at(currentCellNumber).contents.end();
 
-            it2 = grid.at(currentCellNumber - 1).contents.begin();
-            it2_end = grid.at(currentCellNumber - 1).contents.end();
+            it2 = grid->at(currentCellNumber - 1).contents.begin();
+            it2_end = grid->at(currentCellNumber - 1).contents.end();
 
 			while (it1 != it1_end) {
 				(*it1)->deltaWall[3] = (*it1)->radius + ((*it1)->position.getY() - border[3]);

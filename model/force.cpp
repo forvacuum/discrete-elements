@@ -7,7 +7,7 @@ Vector applyWeight(const Particle& p) {
 	return (- p.mass * g * Vector(0, 1));
 }
 
-Vector applyNormalForce(Particle& p, Grid& grid) {
+Vector applyNormalForce(Particle& p, Grid* grid) {
 	Vector resultant = Vector();
 	Vector relativePosition;
 	Vector n;
@@ -20,13 +20,13 @@ Vector applyNormalForce(Particle& p, Grid& grid) {
 
 	/* Iterating through all particles in adjacent grid cells */
 	for (int i = p.gridRow - 1; i <= p.gridRow + 1; i++) {
-		if (i >= 0 && i < grid.horizontalAmount) {
+		if (i >= 0 && i < grid->horizontalAmount) {
 			for (int j = p.gridColumn - 1; j <= p.gridColumn + 1; j++) {
-				if (j >= 0 && j < grid.verticalAmount) {
-					cellIndex = i * grid.verticalAmount + j;
+				if (j >= 0 && j < grid->verticalAmount) {
+					cellIndex = i * grid->verticalAmount + j;
 
-					it = grid.at(cellIndex).contents.begin();
-					lastParticle = grid.at(cellIndex).contents.end();
+					it = grid->at(cellIndex).contents.begin();
+					lastParticle = grid->at(cellIndex).contents.end();
 
 					while (it != lastParticle) { // Excluding the particle itself
 					    if (*it == &p) {
@@ -66,7 +66,7 @@ Vector applyNormalForce(Particle& p, Grid& grid) {
 	return resultant;
 }
 
-Vector applyShearForce(Particle& p, Grid& grid, double timeStep) {
+Vector applyShearForce(Particle& p, Grid* grid, double timeStep) {
 	Vector resultant = Vector();
 	Vector relativePosition;
 	Vector relativeVelocity;
@@ -88,13 +88,13 @@ Vector applyShearForce(Particle& p, Grid& grid, double timeStep) {
 
 //	 Iterating through all particles in adjacent grid cells
 	for (int i = p.gridRow - 1; i <= p.gridRow + 1; i++) {
-		if (i >= 0 && i < grid.horizontalAmount) { // checking for row index correctness
+		if (i >= 0 && i < grid->horizontalAmount) { // checking for row index correctness
 			for (int j = p.gridColumn - 1; j <= p.gridColumn + 1; j++) {
-				if (j >= 0 && j < grid.verticalAmount) { // checking for column index correctness
-					cellIndex = i * grid.verticalAmount + j;
+				if (j >= 0 && j < grid->verticalAmount) { // checking for column index correctness
+					cellIndex = i * grid->verticalAmount + j;
 
-					it = grid.at(cellIndex).contents.begin();
-					lastParticle = grid.at(cellIndex).contents.end();
+					it = grid->at(cellIndex).contents.begin();
+					lastParticle = grid->at(cellIndex).contents.end();
 					
 					// Iterating through all particles in the current cell
 					while (it != lastParticle) {
@@ -212,7 +212,7 @@ Vector applyDissipation(const Particle& p) {
 	return - dampingCoefficient * Vector(p.velocity);
 }
 
-Vector applyForce(Particle& particle, Grid& grid, const double border[4], double timeStep) {
+Vector applyForce(Particle& particle, Grid* grid, const double border[4], double timeStep) {
 	Vector resultant = Vector();
 
 	resultant += applyWeight(particle);
