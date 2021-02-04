@@ -28,9 +28,10 @@ void GridCell::removeParticle(Particle* p) {
 	}
 }
 
-double GridCell::getPreferredSize(double workspaceMeasure) {
-	double m = floor(workspaceMeasure / defaultSize); // should be checked out // amount of cells sized '2 * maxRadius' that can be put into the current workspace
-	double residual = workspaceMeasure - defaultSize * m;
+double GridCell::getPreferredSize(double workspaceSize) { // horizontal or vertical size
+    // amount of cells sized '2 * maxRadius' that can be put into the current workspace
+	double m = floor(workspaceSize / defaultSize);
+	double residual = workspaceSize - defaultSize * m;
 	double additionalSize = residual / m;
 	return defaultSize + additionalSize;
 }

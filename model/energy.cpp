@@ -4,7 +4,7 @@
 #include "force.h"
 
 
-double calculateTotalEnergy(const Particle& particle, const double border[4], Grid& grid) {
+double calculateTotalEnergy(const Particle& particle, const double border[4], Grid* grid) {
 	double totalEnergy = 0;
 
 	/* Kinetic */
@@ -24,7 +24,7 @@ double calculateTotalEnergy(const Particle& particle, const double border[4], Gr
 	return totalEnergy;
 }
 
-double calculateTotalSystemEnergy(const std::vector<Particle>& system, const double border[4], Grid& grid) {
+double calculateTotalSystemEnergy(const std::vector<Particle>& system, const double border[4], Grid* grid) {
     auto it = system.begin();
     double systemEnergy = 0;
     double tmp;
@@ -46,7 +46,7 @@ double potentialEnergy(const Particle& particle, const double border[4]) {
 	return particle.mass * g * (particle.position.getY() - border[2]);  //reference level is considered to be exactly the bottom border line
 }
 
-double normalForceEnergy(const Particle& particle, Grid& grid) {
+double normalForceEnergy(const Particle& particle, Grid* grid) {
 	double result = 0;
 	double delta = 0;
 	size_t cellIndex;
@@ -54,13 +54,13 @@ double normalForceEnergy(const Particle& particle, Grid& grid) {
 	std::vector<Particle*>::iterator lastParticle;
 
 	for (int i = particle.gridRow - 1; i <= particle.gridRow + 1; i++) {
-		if (i >= 0 && i < grid.horizontalAmount) {
+		if (i >= 0 && i < grid->horizontalAmount) {
 			for (int j = particle.gridColumn - 1; j <= particle.gridColumn + 1; j++) {
-				if (j >= 0 && j < grid.verticalAmount) {
-					cellIndex = i * grid.verticalAmount + j;
+				if (j >= 0 && j < grid->verticalAmount) {
+					cellIndex = i * grid->verticalAmount + j;
 
-					it = grid.at(cellIndex).contents.begin();
-					lastParticle = grid.at(cellIndex).contents.end();
+					it = grid->at(cellIndex).contents.begin();
+					lastParticle = grid->at(cellIndex).contents.end();
 
 					while (it != lastParticle) {
 						delta = particle.radius + (*it)->radius - Vector::norm(particle.position - (*it)->position);

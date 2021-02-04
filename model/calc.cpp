@@ -1,6 +1,4 @@
 #include "calc.h"
-#include "impexp.h"
-#include "force.h"
 
 /* This function creates a file named as specified in the argument 'particlesFilename'
 	containing initial data for given amount of randomly generated particles
@@ -63,7 +61,7 @@ void generateParticlesTriangle(const std::string& infoFilename, const std::strin
 }
 
 double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
-          Grid& grid, double timeStep, const double border[4]) {
+          Grid* grid, double timeStep, const double border[4]) {
     double packTime = 0;
     double energyDiff;
     double systemEnergy = 0;
@@ -81,7 +79,7 @@ double pack(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& s
     return packTime;
 }
 
-void setNeighbours(std::vector<Particle>& system, Grid& grid) {
+void setNeighbours(std::vector<Particle>& system, Grid* grid) {
     size_t cellIndex;
     double delta;
     Vector relativePosition;
@@ -93,13 +91,13 @@ void setNeighbours(std::vector<Particle>& system, Grid& grid) {
 
     while (it != system.end()) {
         for (int i = it->gridRow - 1; i <= it->gridRow + 1; i++) {
-            if (i >= 0 && i < grid.horizontalAmount) { // checking for row index correctness
+            if (i >= 0 && i < grid->horizontalAmount) { // checking for row index correctness
                 for (int j = it->gridColumn - 1; j <= it->gridColumn + 1; j++) {
-                    if (j >= 0 && j < grid.verticalAmount) { // checking for column index correctness
-                        cellIndex = i * grid.verticalAmount + j;
+                    if (j >= 0 && j < grid->verticalAmount) { // checking for column index correctness
+                        cellIndex = i * grid->verticalAmount + j;
 
-                        itGrid = grid.at(cellIndex).contents.begin();
-                        lastParticle = grid.at(cellIndex).contents.end();
+                        itGrid = grid->at(cellIndex).contents.begin();
+                        lastParticle = grid->at(cellIndex).contents.end();
 
                         while (itGrid != lastParticle) {
                             if (*itGrid == &(*it)) {
@@ -122,9 +120,9 @@ void setNeighbours(std::vector<Particle>& system, Grid& grid) {
 }
 
 double removeWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
-                  Grid& grid, double timeStep, double packTime, const double *border) {
+                  Grid* grid, double timeStep, const double *border) {
     double workTime = 0;
-    double totalTime = packTime;
+    double totalTime = 0;
     double eps = 1e-7;
     Particle::isWallEnabled[1] = false;
 
@@ -143,9 +141,9 @@ double removeWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Partic
 }
 
 double shiftWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particle>& system,
-                  Grid& grid, double timeStep, double packTime, double *border) {
+                  Grid* grid, double timeStep, double *border) {
     double workTime = 0;
-    double totalTime = packTime;
+    double totalTime = 0;
     double eps = 1e-6;
     //border[3] = highestOrdinate(system) + Particle::maxRadius;
 
@@ -168,7 +166,7 @@ double shiftWall(std::ofstream& fout, std::ofstream& fout_e, std::vector<Particl
 }
 
 // Note: force function is considered not to depend on time explicitly
-void calculatePosition(std::vector<Particle>& system, Grid& grid,
+void calculatePosition(std::vector<Particle>& system, Grid* grid,
                        double timeStep, const double border[4]) {
 	Vector force;
 	auto it = system.begin();
@@ -186,7 +184,7 @@ void calculatePosition(std::vector<Particle>& system, Grid& grid,
 		it->velocity.setX(it->velocity.getX() + timeStep * force.getX() / 2 / it->mass);
 		it->velocity.setY(it->velocity.getY() + timeStep * force.getY() / 2 / it->mass);
 
-		it->refreshGridCoordinates(grid, border);
+        it->refreshGridCoordinates(grid);
 
 		it++;
 	}
@@ -195,7 +193,7 @@ void calculatePosition(std::vector<Particle>& system, Grid& grid,
 
 }
 
-void calculateVelocity(std::vector<Particle>& system, Grid& grid,
+void calculateVelocity(std::vector<Particle>& system, Grid* grid,
                        double timeStep, const double border[4]) {
 	Vector force;
 	auto it = system.begin();
@@ -211,7 +209,7 @@ void calculateVelocity(std::vector<Particle>& system, Grid& grid,
 	}
 }
 
-void calculateNextIteration(std::vector<Particle>& system, Grid& grid, double timeStep, const double border[4]) {
+void calculateNextIteration(std::vector<Particle>& system, Grid* grid, double timeStep, const double border[4]) {
 	calculatePosition(system, grid, timeStep, border);
 	calculateVelocity(system, grid, timeStep, border);
 }
@@ -231,13 +229,13 @@ double calculateEnergyRelation(const std::vector<Particle>& system, const double
     return kinetic / potential;
 }
 
-void checkBorderCrossed(std::vector<Particle>& system, const Grid& grid) {
+void checkBorderCrossed(std::vector<Particle>& system, const Grid* grid) {
     for(auto it = system.begin(); it < system.end(); it++) {
         for (size_t i = 0; i < 4; i++) {
-            if(it->position.getX() < grid.workspaceBorder[0]
-            || it->position.getX() > grid.workspaceBorder[1]
-            || it->position.getY() < grid.workspaceBorder[2]
-            || it->position.getY() > grid.workspaceBorder[3]) {
+            if(it->position.getX() < grid->workspaceBorder[0]
+            || it->position.getX() > grid->workspaceBorder[1]
+            || it->position.getY() < grid->workspaceBorder[2]
+            || it->position.getY() > grid->workspaceBorder[3]) {
                 throw ParticleOutOfBorderException(&(*it));
             }
         }
@@ -274,7 +272,7 @@ Particle* farRight(std::vector<Particle>& system) {
     return result;
 }
 
-std::unordered_set<size_t> getEdge(std::vector<Particle>& system, Grid& grid) {
+std::unordered_set<size_t> getEdge(std::vector<Particle>& system, Grid* grid) {
     std::unordered_set<size_t> edge;
     std::queue<Vector> q;
     std::vector<Vector> visited;
@@ -289,24 +287,24 @@ std::unordered_set<size_t> getEdge(std::vector<Particle>& system, Grid& grid) {
         visited.push_back(coord);
         q.pop();
 
-        /*TODO:  edge.find(coord.getX() * grid.verticalAmount + coord.getY()) == edge.end()
+        /*TODO:  edge.find(coord.getX() * grid->verticalAmount + coord.getY()) == edge.end()
          *      check if this condition is necessary if there is a 'visited' vector? */
 
         for (int i = coord.getX() - 1; i <= coord.getX() + 1; i++) { // grid rows
             for (int j = coord.getY() - 1; j <= coord.getY() + 1; j++) { // grid columns
-                if (i >= 0 && i < grid.horizontalAmount                  // if index is correct
-                    && j >= 0 && j < grid.verticalAmount                     // and there is a least one empty neighbour
-                    && grid.at(i * grid.verticalAmount + j).contents.empty() // and current cell has not been added to the set yet
-                    && edge.find(coord.getX() * grid.verticalAmount + coord.getY()) == edge.end()) {
-                    edge.insert(coord.getX() * grid.verticalAmount + coord.getY());
+                if (i >= 0 && i < grid->horizontalAmount                  // if index is correct
+                    && j >= 0 && j < grid->verticalAmount                     // and there is a least one empty neighbour
+                    && grid->at(i * grid->verticalAmount + j).contents.empty() // and current cell has not been added to the set yet
+                    && edge.find(coord.getX() * grid->verticalAmount + coord.getY()) == edge.end()) {
+                    edge.insert(coord.getX() * grid->verticalAmount + coord.getY());
                     /* Add all not empty and not visited neighbours to the queue */
                     for (int k = coord.getX() - 1; k <= coord.getX() + 1; k++) { // grid rows
                         for (int l = coord.getY() - 1; l <= coord.getY() + 1; l++) { // grid columns
-                            if (k >= 0 && k < grid.horizontalAmount
-                                && l >= 0 && l < grid.verticalAmount
+                            if (k >= 0 && k < grid->horizontalAmount
+                                && l >= 0 && l < grid->verticalAmount
                                 && std::find(visited.begin(), visited.end(), *(new Vector(k, l))) == visited.end()
-                                && !grid.at(k * grid.verticalAmount + l).contents.empty()
-                                && edge.find(k * grid.verticalAmount + l) == edge.end()) {
+                                && !grid->at(k * grid->verticalAmount + l).contents.empty()
+                                && edge.find(k * grid->verticalAmount + l) == edge.end()) {
                                 q.emplace(k, l);
                                 visited.emplace_back(k, l);
                             }

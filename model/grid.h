@@ -19,9 +19,9 @@ struct GridCell {
 
     GridCell();
 	GridCell(double, double);
-	void addParticle(Particle*);
-	void removeParticle(Particle*);
-	static double getPreferredSize(double);
+	void addParticle(Particle* particle);
+	void removeParticle(Particle* particle);
+	static double getPreferredSize(double workspaceSize);
 };
 
 // Add particles system as a class member
@@ -31,10 +31,10 @@ struct Grid {
     size_t verticalAmount;
     double* workspaceBorder;
 
-    Grid(double*);
-    GridCell& at(size_t);
-    void setCellsContents(std::vector<Particle>&);
+    Grid(double* workspace);
+    GridCell& at(size_t index);
+    void setCellsContents(std::vector<Particle>& system);
 
 private:
-    std::vector<GridCell> setGrid(const double[4]);
+    std::vector<GridCell> setGrid(const double workspace[4]);
 };
