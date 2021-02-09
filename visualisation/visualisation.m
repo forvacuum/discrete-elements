@@ -1,7 +1,7 @@
 %% Parameters initialization
 
 borderWidth = 1;
-actionType = 4;
+actionType = 0;
     % 0 - generate
     % 1 - pack
     % 2 - remove wall
@@ -17,7 +17,7 @@ actionType = 4;
 %% Computation
 
 initialize(actionType);
-!C:\Users\Veronika\discrete-elements\model\cmake-build-debug\discrete-elements.exe
+system('execute.bat');
 
 %% Rendering
 
