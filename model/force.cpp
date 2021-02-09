@@ -28,8 +28,8 @@ Vector applyNormalForce(Particle& p, Grid* grid) {
 					it = grid->at(cellIndex).contents.begin();
 					lastParticle = grid->at(cellIndex).contents.end();
 
-					while (it != lastParticle) { // Excluding the particle itself
-					    if (*it == &p) {
+					while (it != lastParticle) {
+					    if (*it == &p) { // Excluding the particle itself
                             it++;
                             continue;
                         }
