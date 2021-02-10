@@ -1,7 +1,7 @@
 %% Parameters initialization
 
 borderWidth = 1;
-actionType = 0;
+actionType = 4;
     % 0 - generate
     % 1 - pack
     % 2 - remove wall
@@ -16,8 +16,8 @@ actionType = 0;
 
 %% Computation
 
-initialize(actionType);
-system('execute.bat');
+% initialize(actionType);
+% system('execute.bat');
 
 %% Rendering
 

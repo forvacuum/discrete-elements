@@ -1,6 +1,6 @@
 function initialize(actionType)
 %% Main informaion
-    border = [0 100 0 70];
+    border = [0 15 0 20];
     timestep = 1e-4;
     
     f = fopen('..\auxiliary\info.txt', 'w');
@@ -24,7 +24,7 @@ function initialize(actionType)
     fclose(f);
     
 %% Generator information
-    particlesAmount = 1000;
+    particlesAmount = 20;
     minRadius = 1;
     maxRadius = 1.5;
 %     density = 0.07;

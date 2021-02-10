@@ -87,8 +87,19 @@ void Environment::execute() {
     fout_e.close();
 
     if(wentOut != nullptr) {
-        std::cout << "One of the particles has crossed the border. Program execution is stopped" << std::endl;
+        throw ParticleOutOfBorderException(wentOut);
+        //std::cout << "One of the particles has crossed the border. Program execution is stopped" << std::endl;
     }
+}
+
+std::string Environment::getDetails() {
+    std::string s = "Border: ";
+    for (int i = 0; i < 4; i++) {
+        s += std::to_string(border[i]) + " ";
+    }
+    s += "\nTime step: " + std::to_string(timeStep);
+
+    return s;
 }
 
 /** Returns the boundaries of the available workspace to set the grid

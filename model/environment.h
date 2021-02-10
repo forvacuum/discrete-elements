@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <string>
 #include <vector>
 #include <iterator>
 #include "vector2D.h"
@@ -37,6 +38,7 @@ public:
     Environment();
     void setSystem();
     void execute();
+    std::string getDetails();
 private:
     double* setWorkspace();
 };
