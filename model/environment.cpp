@@ -1,8 +1,7 @@
 #include "environment.h"
 
 Environment::Environment() {
-    std::string infoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\info.txt)";
-    std::ifstream fin(infoFile);
+    std::ifstream fin(inputInfoFile);
 
     int type;
     border = new double[4];
@@ -14,10 +13,12 @@ Environment::Environment() {
     fin >> timeStep;
     fin >> type;
     fin.close();
-    actionType = static_cast<Action>(type);
+    action = static_cast<Action>(type);
     workspace = setWorkspace();
+}
 
-    if(actionType != GENERATE) {
+void Environment::setSystem() {
+    if(action != GENERATE) {
         system = importParticles(particlesFile,
                                  constantsFile);
         GridCell::defaultSize = Particle::maxRadius * 2;
@@ -29,15 +30,15 @@ Environment::Environment() {
 }
 
 void Environment::execute() {
-    if(actionType == GENERATE) {
+    if(action == GENERATE) {
         generateParticlesTriangle(generatorInfoFile, particlesFile, border);
         return;
     }
     Particle* wentOut = nullptr;
-    std::ofstream fout(outputFile);
+    std::ofstream fout(outputParticlesFile);
     std::ofstream fout_e(outputEnergyFile);
-    exportDetails(R"(C:\Users\Veronika\discrete-elements\visualisation\info.txt)", border, system);
-    switch (actionType) {
+    exportDetails(outputInfoFile, border, system);
+    switch (action) {
         case PACK:
             Particle::isPacked = false;
             try {
@@ -68,7 +69,7 @@ void Environment::execute() {
                 shiftWall(fout, fout_e, system, grid, timeStep, border);
                 fout << 0 << " ";
                 appendSystemPosition(fout, system);
-                exportParticles(R"(C:\Users\Veronika\discrete-elements\auxiliary\shifted.txt)", system);
+                exportParticles(particlesFile, system);
             } catch (ParticleOutOfBorderException& e) {
                 wentOut = e.what();
             }
@@ -76,9 +77,9 @@ void Environment::execute() {
         case GET_EDGE:
             fout << 0 << " ";
             appendSystemPosition(fout, system);
-            exportEdge(R"(C:\Users\Veronika\discrete-elements\visualisation\edge.txt)",
+            exportEdge(outputEdgeFile,
                        grid, getEdge(system, grid));
-            exportGrid(R"(C:\Users\Veronika\discrete-elements\visualisation\grid.txt)", grid);
+            exportGrid(outputGridFile, grid);
         default:
             break;
     }
@@ -86,15 +87,26 @@ void Environment::execute() {
     fout_e.close();
 
     if(wentOut != nullptr) {
-        std::cout << "One of the particles has crossed the border. Program execution is stopped" << std::endl;
+        throw ParticleOutOfBorderException(wentOut);
+        //std::cout << "One of the particles has crossed the border. Program execution is stopped" << std::endl;
     }
+}
+
+std::string Environment::getDetails() {
+    std::string s = "Border: ";
+    for (int i = 0; i < 4; i++) {
+        s += std::to_string(border[i]) + " ";
+    }
+    s += "\nTime step: " + std::to_string(timeStep);
+
+    return s;
 }
 
 /** Returns the boundaries of the available workspace to set the grid
  *
  * The height of the workspace calculations are based on the assumption
  * that the angle of repose is unlikely to be less than 7° **/
-double* Environment::setWorkspace(){
+double* Environment::setWorkspace() {
     double borderWidth = border[1] - border[0];
 
     double extraWidth = borderWidth;

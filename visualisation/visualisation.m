@@ -16,8 +16,8 @@ actionType = 4;
 
 %% Computation
 
-initialize(actionType);
-!C:\Users\Veronika\discrete-elements\model\cmake-build-debug\discrete-elements.exe
+% initialize(actionType);
+% system('execute.bat');
 
 %% Rendering
 

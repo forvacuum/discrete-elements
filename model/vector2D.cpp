@@ -86,7 +86,7 @@ double Vector::norm(const Vector& v) {
 }
 
 ostream& operator<<(ostream& out, const Vector& vector) {
-	out << "(" << vector.x << ", " << vector.y << ")" << std::endl;
+	out << "(" << vector.x << ", " << vector.y << ") ";
 	return out;
 }
 

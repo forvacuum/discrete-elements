@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <string>
 #include <vector>
 #include <iterator>
 #include "vector2D.h"
@@ -14,22 +15,30 @@
 
 struct Environment {
 public:
-    std::string particlesFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\particles.txt)";
-    std::string constantsFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\const.txt)";
-    std::string generatorInfoFile = R"(C:\Users\Veronika\discrete-elements\auxiliary\generatorinfo.txt)";
-    std::string outputFile = R"(C:\Users\Veronika\discrete-elements\visualisation\output.txt)";
-    std::string outputEnergyFile = R"(C:\Users\Veronika\discrete-elements\visualisation\energy.txt)";
+    std::string inputInfoFile = "..\\..\\auxiliary\\info.txt";
+    std::string particlesFile = "..\\..\\auxiliary\\particles.txt";
+    std::string constantsFile = "..\\..\\auxiliary\\const.txt";
+    std::string generatorInfoFile = "..\\..\\auxiliary\\generatorinfo.txt";
+
+    std::string outputInfoFile = "..\\..\\visualisation\\info.txt";
+    std::string outputParticlesFile = "..\\..\\visualisation\\output.txt";
+    std::string outputEnergyFile = "..\\..\\visualisation\\energy.txt";
+    std::string outputEdgeFile = "..\\..\\visualisation\\edge.txt";
+    std::string outputGridFile = "..\\..\\visualisation\\grid.txt";
+
 
     double* border;
     double* workspace;
     double timeStep;
-    Action actionType;
+    Action action;
 
     std::vector<Particle> system;
     Grid* grid;
 
     Environment();
+    void setSystem();
     void execute();
+    std::string getDetails();
 private:
     double* setWorkspace();
 };
