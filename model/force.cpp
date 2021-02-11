@@ -201,7 +201,7 @@ Vector applyWallFriction(const Particle &p) {
             //project the current velocity vector to a contact plane
             e = Vector::dotProduct(p.velocity, duplicatedBasis[i]) * duplicatedBasis[i];
             //normalization and redirecting
-            e = - p.velocity * (1 / Vector::norm(p.velocity));
+            e = - e * (1 / Vector::norm(e));
             resultant += frictionCoefficient * Particle::stiffnessRepulsive * p.deltaWall[i] * e;
         }
     }
