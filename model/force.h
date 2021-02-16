@@ -16,8 +16,9 @@ struct Particle;
 struct Grid;
 
 Vector applyWeight(const Particle& particle);
-Vector applyNormalForce(Particle& particle, Grid* grid);
-Vector applyShearForce(Particle& particle, Grid* grid, double timeStep);
+//Vector applyNormalForce(Particle& particle, Grid* grid);
+//Vector applyShearForce(Particle& particle, Grid* grid, double timeStep);
+Vector applyParticlesInteraction(Particle &p, Grid *grid, double timeStep);
 Vector applyWallRepulsion(const Particle& particle);
 Vector applyWallFriction(const Particle& particle);
 Vector applyDissipation(const Particle& particle);
