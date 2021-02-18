@@ -332,7 +332,7 @@ Vector applyForce(Particle& particle, Grid* grid, const double border[4], double
 	Vector resultant = Vector();
 
 	resultant += applyWeight(particle);
-	resultant += applyParticlesInteraction(particle, grid, 0);
+	resultant += applyParticlesInteraction(particle, grid, timeStep);
 	//resultant += applyShearForce(particle, grid, timeStep);
 	resultant += applyWallRepulsion(particle);
 	resultant += applyWallFriction(particle);
